@@ -17,7 +17,18 @@ app.use(express.static(path.join(__dirname, "public")))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
  
+//applicant
 const applicantRoutes = require('./routes/applicantRoutes');
+
+//interview
+
+
+//company
+const positionRoutes = require("./routes/company/positionRoutes")
+const userRoutes = require("./routes/company/userRoutes")
+
+
+
 app.use('/applicants', applicantRoutes);
 
 app.get('/', (req, res) => res.send('Hello World!'))
