@@ -9,9 +9,7 @@ router.get("/:company_id/", applicantController.getAllApplicants)
 router.get("/:company_id/filter/", applicantController.getApplicantsFilter)
 
 //gets a specific applicant
-router.get("/:company_id/:applicant_id", applicantController.getApplicants);
-
-
+router.get("/:company_id/:applicant_id", applicantController.getApplicant);
 
 
 module.exports = router;
