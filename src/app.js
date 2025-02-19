@@ -18,9 +18,9 @@ app.use(express.static(path.join(__dirname, "public")))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
-//Disable CORS protection from this origin
-// const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
-// app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+//Disable CORS protection from this react project origin
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
+app.use(cors({origin: CLIENT_ORIGIN, credentials: true}))
 
 //auth
  
@@ -33,12 +33,14 @@ const applicantRoutes = require('./routes/applicant/applicantRoutes');
 
 //analytic
 
+
+// Routes
 app.use('/applicants', applicantRoutes);
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
 app.get("/test-api", (req, res) => {
-    res.json({message:"working..."})
+    res.json({message:"backend is working..."})
 })
 
 module.exports = app;
