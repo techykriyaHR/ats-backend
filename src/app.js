@@ -24,6 +24,18 @@ app.use(express.json())
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
 app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }))
 
+
+// Transporter for email feature
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+})
+
 //auth
 
 //applicant
@@ -39,6 +51,9 @@ const applicantRoutes = require('./routes/applicant/applicantRoutes');
 // Routes
 app.use('/applicants', applicantRoutes);
 
+
+
+// Test endpoint
 app.get('/', (req, res) => res.send('Hello World!'))
 
 app.get("/test-api", (req, res) => {
@@ -51,35 +66,12 @@ app.get("/test-api", (req, res) => {
     res.json({ message: "backend is working..." })
 })
 
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-})
-
-
-// transporter.sendMail({
-//     to: "benz.medrano@fullsuite.ph",
-//     subject: "test nodemailer", 
-//     html: '<h1>i am within and without. </h1>'
-// }).then(() => {
-//     console.log('email sent');
-
-// }).catch(() => {
-//     console.log("error");
-
-// })
 app.post("/send-email", async (req, res) => {
     try {
         const { to, subject, text } = req.body;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"FullSuite" <${process.env.EMAIL_USER}>`,
             to,
             subject,
             html: "<h1>sample</h1><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/640px-Cat_August_2010-4.jpg'>",
