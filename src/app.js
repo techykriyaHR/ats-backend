@@ -3,7 +3,8 @@ const fs = require("fs")
 const cors = require("cors")
 const dotenv = require('dotenv');
 const pool = require("./config/db");
-
+// import nodemailer from 'nodemailer';
+const nodemailer = require("nodemailer")
 dotenv.config();
 
 const express = require('express')
@@ -49,5 +50,49 @@ app.get("/test-api", (req, res) => {
 
     res.json({ message: "backend is working..." })
 })
+
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+})
+
+
+// transporter.sendMail({
+//     to: "benz.medrano@fullsuite.ph",
+//     subject: "test nodemailer", 
+//     html: '<h1>i am within and without. </h1>'
+// }).then(() => {
+//     console.log('email sent');
+
+// }).catch(() => {
+//     console.log("error");
+
+// })
+app.post("/send-email", async (req, res) => {
+    try {
+        const { to, subject, text } = req.body;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to,
+            subject,
+            html: "<h1>sample</h1><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/640px-Cat_August_2010-4.jpg'>",
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent: " + info.response);
+
+        res.status(200).json({ message: "Email sent successfully!" });
+    } catch (error) {
+        console.error("Error sending email:", error);
+        res.status(500).json({ message: "Failed to send email" });
+    }
+});
 
 module.exports = app;
