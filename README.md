@@ -67,3 +67,13 @@ We are using the `nodemailer` library to send email. We are using an email provi
     - Clicked on `app and password`
     - generate `password`
     - paste the user and the generated password on the env file. 
+
+3. To customize the name that will appear in the email, use
+```javascript
+ const mailOptions = {
+            from: `"FullSuite" <${process.env.EMAIL_USER}>`,
+            to,
+            subject,
+            html: "<h1>sample</h1>",
+        };
+```
