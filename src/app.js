@@ -41,10 +41,14 @@ const addApplicantRoutes = require('./routes/applicant/addApplicantRoutes')
 
 //analytic
 
+//counter
+const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute')
+
 
 // Routes
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
+app.use('/counter', applicantCounterRoutes);
 
 app.post("/send-email", async (req, res) => {
     try {
