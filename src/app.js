@@ -10,12 +10,6 @@ dotenv.config();
 const express = require('express')
 const app = express()
 
-//do we have to se method-overrite middleware? what are alternatives
-//think about it. if we're going to use js to communicate with the backend, 
-//we're not restricted to the methods of HTML. 
-// const methodOverride = require("method-override")
-// app.use(methodOverride('_method'))
-
 app.use(express.static(path.join(__dirname, "public")))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -34,13 +28,13 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
-})
+});
 
 //auth
 
 //applicant
 const applicantRoutes = require('./routes/applicant/applicantRoutes');
-
+const addApplicantRoutes = require('./routes/applicant/addApplicantRoutes')
 //interview
 
 //company
@@ -50,21 +44,7 @@ const applicantRoutes = require('./routes/applicant/applicantRoutes');
 
 // Routes
 app.use('/applicants', applicantRoutes);
-
-
-
-// Test endpoint
-app.get('/', (req, res) => res.send('Hello World!'))
-
-app.get("/test-api", (req, res) => {
-
-    pool.query('SELECT * FROM users', function (err, results, fields) {
-        if (err) throw err;
-        console.log(results);
-    });
-
-    res.json({ message: "backend is working..." })
-})
+app.use('/applicants/add', addApplicantRoutes);
 
 app.post("/send-email", async (req, res) => {
     try {
