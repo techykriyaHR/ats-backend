@@ -1,22 +1,69 @@
+const { v4: uuidv4 } = require("uuid");
 const pool = require("../../config/db");
-
+const app = require("../../app");
 //insert
-const insertApplicant = (applicant) => {
-    //here we will be inserting to multiple tables.
-    // we need to insert into applicants, contacts_info, and applicants_trackings
-    const sql = ``;
-    const values = [];
+const insertApplicant = async (applicant) => {
+    const applicant_id = uuidv4();
+    const contact_id = uuidv4();
+    const tracking_id = uuidv4();
+    const progress_id = uuidv4();
 
-    pool.execute(sql, values, (error, result) => {
-        if (error) {
-            return false;
-        }
+    try {
+        // Insert into applicants
+        let sql = `INSERT INTO applicants (applicant_id, first_name, middle_name, last_name, contact_id, gender, birth_date, discovered_at, cv_link) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        let values = [
+            applicant_id,
+            applicant.first_name,
+            applicant.middle_name || null,
+            applicant.last_name,
+            contact_id,
+            applicant.gender,
+            applicant.birth_date,
+            applicant.discovered_at,
+            applicant.cv_link || null
+        ];
+        await pool.execute(sql, values);
+
+        // Insert into contacts_info
+        sql = `INSERT INTO contacts_info (contact_id, applicant_id, mobile_number_1, mobile_number_2, email_1, email_2, email_3) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        values = [
+            contact_id,
+            applicant_id,
+            applicant.mobile_number_1 || null,
+            applicant.mobile_number_2 || null,
+            applicant.email_1,
+            applicant.email_2 || null,
+            applicant.email_3 || null
+        ];
+        await pool.execute(sql, values);
+
+        // Insert into applicants_trackings
+        sql = `INSERT INTO applicants_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        values = [
+            tracking_id,
+            applicant_id,
+            progress_id,
+            applicant.created_by,
+            applicant.updated_by,
+            applicant.applied_source || null,
+            applicant.referrer_id || null,
+            applicant.company_id,
+            applicant.position_id
+        ];
+        await pool.execute(sql, values);
+
         return true;
-    })
-}
+    } catch (error) {
+        console.error("Error inserting applicant:", error);
+        return false;
+    }
+};
 
 //get applicants from database
-const getAllApplicants = () => {
+const getAllApplicants = async () => {
     const sql = `
         SELECT *
         FROM applicants 
@@ -24,14 +71,15 @@ const getAllApplicants = () => {
         ON contacts_info.contact_id = applicants.contact_id
     `;
 
-    pool.execute(sql, (error, result) => {
-        if (error) {
-            return [];
-        }
-        return result;
-    });
-}
+    try {
+        const [results, fields] = await pool.execute(sql);
+        return results
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
 
+}
 
 //compare 
 const compare = (applicant, applicantsFromDB) => {
@@ -78,8 +126,8 @@ const compare = (applicant, applicantsFromDB) => {
             }
         }
 
-        if (applicant.birthDate == applicantFromDb.birthDate) {
-            similarity.push(birthDate);
+        if (applicant.birth_date == applicantFromDb.birth_date) {
+            similarity.push(applicant.birth_date); // Fix variable reference
         }
 
         if (similarity.length > 0) {
@@ -90,27 +138,47 @@ const compare = (applicant, applicantsFromDB) => {
     return posibleDuplicates;
 }
 
+//create a code for realtime detection off duplicates
+exports.addApplicant = async (req, res) => {
+    const applicant = req.body.applicant;
+    // const applicant = {
+    //     "first_name": "John",
+    //     "middle_name": "Doe",
+    //     "last_name": "Smith",
+    //     "gender": "Male",
+    //     "birth_date": "1990-05-15",
+    //     "discovered_at": "PODCAST",
+    //     "cv_link": "https://example.com/cv.pdf",
+    //     "mobile_number_1": "+1234567890",
+    //     "mobile_number_2": "+0987654321",
+    //     "email_1": "johadfdssdfsdfzssadssdfn@example.com",
+    //     "email_2": "johnsdsdfsdssdfsd.doe@example.com",
+    //     "email_3": "johnsdsdfdssa.doe@example.com",
+    //     "created_by": "admin",
+    //     "updated_by": "admin",
+    //     "applied_source": "LINKEDIN",
+    //     "referrer_id": "123",
+    //     "company_id": "c123",
+    //     "position_id": "p456"
+    // }
 
+    console.log("applicant object literal: ", applicant);
 
-
-exports.addApplicant = (req, res) => {
-        const applicant = req.body.applicant;
-
-        const isSuccess = insertApplicant(applicant);
-        if (isSuccess) {
-            res.status(201).json({message: "successfully inserted"})
-        }
-        res.status(500).json({message: "failed to insert"})
+    const isSuccess = await insertApplicant(applicant);
+    if (isSuccess) {
+        res.status(201).json({ message: "successfully inserted" })
+    }
+    res.status(500).json({ message: "failed to insert" })
 }
 
-exports.uploadApplicants = (req, res) => {
+exports.uploadApplicants = async (req, res) => {
     try {
         const applicants = req.body.applicants;
         const flagged = [];
         console.log("applicants array of object literal: ", applicants);
 
         //get data from database
-        const applicantsFromDB = getAllApplicants();
+        const applicantsFromDB = await getAllApplicants();
 
         //compare
         applicants.forEach((applicant) => {
@@ -126,15 +194,13 @@ exports.uploadApplicants = (req, res) => {
             }
         });
 
-
         if (flagged.length > 0) {
-            res.status(200).json({message: "duplicates detected", flagged: flagged})
+            res.status(200).json({ message: "duplicates detected", flagged: flagged })
         }
-        else {
-            res.status(201).json({message: "All applicants successfully inserted"})
-        }
+        res.status(201).json({ message: "All applicants successfully inserted" })
+
 
     } catch (error) {
-        res.json({ message: error });
+        res.status(500).json({ message: "Error processing applicants", error });
     }
 }

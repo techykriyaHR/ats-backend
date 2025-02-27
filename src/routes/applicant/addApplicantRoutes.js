@@ -4,10 +4,10 @@ const router = express.Router();
 
 const addApplicantController = require("../../controllers/applicant/addApplicantController")
 
-// applicant/add/
+// applicants/add/
 router.post("/", addApplicantController.addApplicant);
 
-// applicant/add/upload
+// applicants/add/upload
 router.post("/upload", addApplicantController.uploadApplicants);
 
 module.exports = router;

@@ -18,7 +18,6 @@ app.use(express.json())
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
 app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }))
 
-
 // Transporter for email feature
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -26,7 +25,7 @@ const transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: process.env.EMAIL_PASS, 
     }
 });
 
@@ -74,6 +73,15 @@ app.post("/send-email", async (req, res) => {
 
 app.get("/test-quill", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "public", "index.html"))
+})
+
+app.get("/test-mysql", async (req, res) => {
+    const [results, fields] = await pool.execute(
+        'SELECT * FROM applicants'
+      );
+
+    res.status(200).json(results)
+    
 })
 
 module.exports = app;
