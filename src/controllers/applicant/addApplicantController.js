@@ -140,33 +140,14 @@ const compare = (applicant, applicantsFromDB) => {
 
 //create a code for realtime detection off duplicates
 exports.addApplicant = async (req, res) => {
-    const applicant = req.body.applicant;
-    // const applicant = {
-    //     "first_name": "John",
-    //     "middle_name": "Doe",
-    //     "last_name": "Smith",
-    //     "gender": "Male",
-    //     "birth_date": "1990-05-15",
-    //     "discovered_at": "PODCAST",
-    //     "cv_link": "https://example.com/cv.pdf",
-    //     "mobile_number_1": "+1234567890",
-    //     "mobile_number_2": "+0987654321",
-    //     "email_1": "johadfdssdfsdfzssadssdfn@example.com",
-    //     "email_2": "johnsdsdfsdssdfsd.doe@example.com",
-    //     "email_3": "johnsdsdfdssa.doe@example.com",
-    //     "created_by": "admin",
-    //     "updated_by": "admin",
-    //     "applied_source": "LINKEDIN",
-    //     "referrer_id": "123",
-    //     "company_id": "c123",
-    //     "position_id": "p456"
-    // }
+    const applicant = JSON.parse(req.body.applicant);
 
+    console.log(`type of applicant: ${typeof (applicant)}`);
     console.log("applicant object literal: ", applicant);
 
     const isSuccess = await insertApplicant(applicant);
     if (isSuccess) {
-        res.status(201).json({ message: "successfully inserted" })
+        return res.status(201).json({ message: "successfully inserted" })
     }
     res.status(500).json({ message: "failed to insert" })
 }
