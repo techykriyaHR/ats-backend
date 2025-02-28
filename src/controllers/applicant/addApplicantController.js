@@ -23,11 +23,13 @@ const insertApplicant = async (applicant) => {
             applicant.discovered_at,
             applicant.cv_link || null
         ];
+
         await pool.execute(sql, values);
 
         // Insert into contacts_info
         sql = `INSERT INTO contacts_info (contact_id, applicant_id, mobile_number_1, mobile_number_2, email_1, email_2, email_3) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        
         values = [
             contact_id,
             applicant_id,
@@ -66,7 +68,7 @@ const insertApplicant = async (applicant) => {
 const getAllApplicants = async () => {
     const sql = `
         SELECT *
-        FROM applicants 
+        FROM applicants
         INNER JOIN contacts_info
         ON contacts_info.contact_id = applicants.contact_id
     `;
@@ -78,7 +80,6 @@ const getAllApplicants = async () => {
         console.error(error);
         return [];
     }
-
 }
 
 //compare 
@@ -93,41 +94,41 @@ const compare = (applicant, applicantsFromDB) => {
         const applicantFromDBFullname = applicantFromDb.first_name + " " + applicantFromDb.middle_name + " " + applicantFromDb.last_name;
 
         if (applicant.first_name == applicantFromDb.first_name) {
-            similarity.push(applicantFullname);
+            similarity.push("Name");
         }
 
         if (applicantFromDb.email_1) {
             if (applicant.email == applicantFromDb.email_1) {
-                similarity.push(applicant.email);
+                similarity.push("Email");
             }
         }
 
         if (applicantFromDb.email_2) {
             if (applicant.email == applicantFromDb.email_2) {
-                similarity.push(applicant.email);
+                similarity.push("Second Email");
             }
         }
 
         if (applicantFromDb.email_3) {
             if (applicant.email == applicantFromDb.email_3) {
-                similarity.push(applicant.email);
+                similarity.push("Third Email");
             }
         }
 
         if (applicantFromDb.mobile_number_1) {
             if (applicant.contactNo == applicantFromDb.mobile_number_1) {
-                similarity.push(applicant.contactNo);
+                similarity.push("Mobile Number");
             }
         }
 
         if (applicantFromDb.mobile_number_2) {
             if (applicant.contactNo == applicantFromDb.mobile_number_2) {
-                similarity.push(applicant.contactNo);
+                similarity.push("Second Mobile Number");
             }
         }
 
         if (applicant.birth_date == applicantFromDb.birth_date) {
-            similarity.push(applicant.birth_date); // Fix variable reference
+            similarity.push("Birthdate");
         }
 
         if (similarity.length > 0) {
@@ -142,9 +143,6 @@ const compare = (applicant, applicantsFromDB) => {
 exports.addApplicant = async (req, res) => {
     const applicant = JSON.parse(req.body.applicant);
 
-    console.log(`type of applicant: ${typeof (applicant)}`);
-    console.log("applicant object literal: ", applicant);
-
     const isSuccess = await insertApplicant(applicant);
     if (isSuccess) {
         return res.status(201).json({ message: "successfully inserted" })
@@ -154,10 +152,11 @@ exports.addApplicant = async (req, res) => {
 
 exports.uploadApplicants = async (req, res) => {
     try {
-        const applicants = req.body.applicants;
+        const applicants = JSON.parse(req.body.applicants);
+        
         const flagged = [];
         console.log("applicants array of object literal: ", applicants);
-
+        console.log("type ", typeof(applicants));
         //get data from database
         const applicantsFromDB = await getAllApplicants();
 
@@ -171,16 +170,15 @@ exports.uploadApplicants = async (req, res) => {
                 flagged.push({ applicant: applicant, posibleDuplicates: posibleDuplicates })
             } else {
                 //insert to the db if not flag as duplicate
-                insertApplicant(applicant);
+                
+                insertApplicant(applicant) ? console.log("inserted") : console.log("failed")
             }
         });
 
         if (flagged.length > 0) {
-            res.status(200).json({ message: "duplicates detected", flagged: flagged })
+            return res.status(200).json({ message: "duplicates detected", flagged: flagged })
         }
         res.status(201).json({ message: "All applicants successfully inserted" })
-
-
     } catch (error) {
         res.status(500).json({ message: "Error processing applicants", error });
     }

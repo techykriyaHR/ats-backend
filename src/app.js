@@ -3,6 +3,9 @@ const fs = require("fs")
 const cors = require("cors")
 const dotenv = require('dotenv');
 const pool = require("./config/db");
+
+const updateStatusCronJob = require("./controllers/cronjob/updateStatus")
+
 // import nodemailer from 'nodemailer';
 const nodemailer = require("nodemailer")
 dotenv.config();
@@ -28,6 +31,9 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS, 
     }
 });
+
+// Cron Jobs
+updateStatusCronJob();
 
 //auth
 
