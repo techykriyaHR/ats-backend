@@ -1,6 +1,8 @@
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../../config/db");
 const app = require("../../app");
+
+
 //insert
 const insertApplicant = async (applicant) => {
     const applicant_id = uuidv4();
@@ -140,7 +142,22 @@ const compare = (applicant, applicantsFromDB) => {
     return posibleDuplicates;
 }
 
+//This works for both checking from Suitelifer's website &
+//detecting duplicates on manual input of applicants in ATS. 
+exports.checkDuplicates =  async (req, res) => {
+    const applicant = JSON.parse(req.body.applicant);
+    const applicantsFromDB = await getAllApplicants();
+
+    const posibleDuplicates = compare(applicant, applicantsFromDB);
+    if (posibleDuplicates.length > 0) {
+        return res.json({isDuplicate: true, message: "possible duplicates detected", posibleDuplicates: posibleDuplicates});
+    }
+    return res.json({isDuplicate: false, message: "no duplicates detected"});
+}
+
 //create a code for realtime detection off duplicates
+//We first check whether duplicates exist using checkDuplicates controller. 
+//If it is false, we proceed to add it on using addApplicant controller. 
 exports.addApplicant = async (req, res) => {
     const applicant = JSON.parse(req.body.applicant);
 
@@ -171,8 +188,7 @@ exports.uploadApplicants = async (req, res) => {
                 flagged.push({ applicant: applicant, posibleDuplicates: posibleDuplicates })
             } else {
                 //insert to the db if not flag as duplicate
-                
-                insertApplicant(applicant) ? console.log("inserted") : console.log("failed")
+                insertApplicant(applicant) ? console.log("inserted") : console.log("failed");
             }
         });
 

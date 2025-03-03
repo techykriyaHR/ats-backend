@@ -10,4 +10,7 @@ router.post("/", addApplicantController.addApplicant);
 // applicants/add/upload
 router.post("/upload", addApplicantController.uploadApplicants);
 
+//applicants/add/check-duplicates
+router.post("/check-duplicates", addApplicantController.checkDuplicates);
+
 module.exports = router;
