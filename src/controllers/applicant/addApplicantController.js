@@ -90,9 +90,10 @@ const compare = (applicant, applicantsFromDB) => {
         const similarity = []
 
         // both applicant and applicantFromDB are object
-        const applicantFullname = applicant.first_name + " " + applicant.middle_name + " " + applicant.last_name;
-        const applicantFromDBFullname = applicantFromDb.first_name + " " + applicantFromDb.middle_name + " " + applicantFromDb.last_name;
+        const applicantFullname = `${applicant.first_name} ${applicant.middle_name ?? ""} ${applicant.last_name}`.trim();
+        const applicantFromDBFullname = `${applicantFromDb.first_name} ${applicantFromDb.middle_name ?? ""} ${applicantFromDb.last_name}`.trim();
 
+        
         if (applicant.first_name == applicantFromDb.first_name) {
             similarity.push("Name");
         }
