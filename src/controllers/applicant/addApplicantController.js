@@ -12,7 +12,7 @@ const insertApplicant = async (applicant) => {
 
     try {
         // Insert into applicants
-        let sql = `INSERT INTO applicants (applicant_id, first_name, middle_name, last_name, contact_id, gender, birth_date, discovered_at, cv_link) 
+        let sql = `INSERT INTO ats_applicants (applicant_id, first_name, middle_name, last_name, contact_id, gender, birth_date, discovered_at, cv_link) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         let values = [
             applicant_id,
@@ -29,7 +29,7 @@ const insertApplicant = async (applicant) => {
         await pool.execute(sql, values);
 
         // Insert into contacts_info
-        sql = `INSERT INTO contacts_info (contact_id, applicant_id, mobile_number_1, mobile_number_2, email_1, email_2, email_3) 
+        sql = `INSERT INTO ats_contact_infos (contact_id, applicant_id, mobile_number_1, mobile_number_2, email_1, email_2, email_3) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
         
         values = [
@@ -44,7 +44,7 @@ const insertApplicant = async (applicant) => {
         await pool.execute(sql, values);
 
         // Insert into applicants_trackings
-        sql = `INSERT INTO applicants_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
+        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
@@ -70,9 +70,8 @@ const insertApplicant = async (applicant) => {
 const getAllApplicants = async () => {
     const sql = `
         SELECT *
-        FROM applicants
-        INNER JOIN contacts_info
-        ON contacts_info.contact_id = applicants.contact_id
+        FROM ats_applicants
+        INNER JOIN ats_contact_infos USING (contact_id)
     `;
 
     try {
@@ -195,7 +194,7 @@ exports.uploadApplicants = async (req, res) => {
         if (flagged.length > 0) {
             return res.status(200).json({ message: "duplicates detected", flagged: flagged })
         }
-        res.status(201).json({ message: "All applicants successfully inserted" })
+        return res.status(201).json({ message: "All applicants successfully inserted" })
     } catch (error) {
         res.status(500).json({ message: "Error processing applicants", error });
     }

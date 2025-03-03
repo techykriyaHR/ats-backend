@@ -2,7 +2,7 @@ const pool = require("../../config/db");
 
 exports.getAllApplicants = (req, res) => {
 
-    const sql = "SELECT * FROM applicants";
+    const sql = "SELECT * FROM ats_applicants";
 
 
     pool.execute(sql, (error, result) => {

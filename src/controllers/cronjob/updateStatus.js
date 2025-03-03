@@ -6,9 +6,9 @@ const { v4: uuidv4 } = require("uuid");
 const getBlackListedApplicants = async () => {
     const sql = `
                 SELECT * 
-                FROM applicants a
-                INNER JOIN applicants_trackings at USING (applicant_id)
-                INNER JOIN applications_progress ap USING (progress_id)
+                FROM ats_applicants a
+                INNER JOIN ats_applicant_trackings at USING (applicant_id)
+                INNER JOIN ats_applicant_progress ap USING (progress_id)
                 WHERE ap.status = 'BLACKLISTED';
     `;
 
@@ -25,7 +25,7 @@ const getBlackListedApplicants = async () => {
 const updateStatus = async (applicant) => {
     try {
         const sql = `
-            UPDATE applications_progress 
+            UPDATE ats_applicant_progress 
             SET stage=?, status=?, blacklisted_type=?, reason=?
             WHERE progress_id = ?
         `;
@@ -75,7 +75,7 @@ const addNotification = async (data) => {
         const notification_id = uuidv4();
 
         const sql = `
-            INSERT INTO notification (notification_id, notification_type, applicant_id) VALUES (?, ?, ?)
+            INSERT INTO ats_notifications (notification_id, notification_type, applicant_id) VALUES (?, ?, ?)
         `;
         const values = [notification_id, data.notification_type, data.applicant_id]
 
@@ -95,9 +95,7 @@ const updateStatusCronJob = () => {
             update 
             add to notification
             sent email
-
     */
-
 
     //run every 10 seconds
     cron.schedule("0 0 * * *", async () => {
@@ -122,6 +120,8 @@ const updateStatusCronJob = () => {
             console.log(error);
         }
     });
+
+    
 }
 
 
