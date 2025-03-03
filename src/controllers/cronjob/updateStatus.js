@@ -1,13 +1,15 @@
 const cron = require("node-cron")
 const pool = require("../../config/db");
 const { differenceInMonths } = require("date-fns");
+const { v4: uuidv4 } = require("uuid");
+
 const getBlackListedApplicants = async () => {
     const sql = `
                 SELECT * 
                 FROM applicants a
                 INNER JOIN applicants_trackings at USING (applicant_id)
-                INNER JOIN applicants_pogress ap USING (progress_id)
-                WHERE ap.status == 'BLACKLISTED';
+                INNER JOIN applications_progress ap USING (progress_id)
+                WHERE ap.status = 'BLACKLISTED';
     `;
 
     try {
@@ -19,13 +21,6 @@ const getBlackListedApplicants = async () => {
     }
 }
 
-// const updateStatus = (applicant) => {
-//     const sql = `
-//         UPDATE applications_progress 
-//         SET stage='PRE-SCREENING', status='NONE', blacklisted_type='null', reason='null'
-
-//     `;
-// }
 
 const updateStatus = async (applicant) => {
     try {
@@ -34,7 +29,7 @@ const updateStatus = async (applicant) => {
             SET stage=?, status=?, blacklisted_type=?, reason=?
             WHERE progress_id = ?
         `;
-        const values = ['PRE-SCREENING', 'NONE', null, null, applicant.progress_id];
+        const values = ['PRE_SCREENING', 'NONE', null, null, applicant.progress_id];
         await pool.execute(sql, values);
 
         return true
@@ -49,7 +44,7 @@ const checkDateElapsed = (applicant) => {
         if (applicant.blacklisted_type == "SOFT") {
             //differences in dates
             const updated_at = new Date(applicant.updated_at);
-            const current_date = new Date.now();
+            const current_date = new Date();
             const difference = differenceInMonths(current_date, updated_at);
 
             if (difference >= 6) {
@@ -59,11 +54,11 @@ const checkDateElapsed = (applicant) => {
         else if (applicant.blacklisted_type == "HARD") {
             //differences in dates
             const updated_at = new Date(applicant.updated_at);
-            const current_date = new Date.now();
+            const current_date = new Date();
             const difference = differenceInMonths(current_date, updated_at);
 
             if (difference >= 12) {
-               return true
+                return true
             }
         }
         else {
@@ -71,6 +66,24 @@ const checkDateElapsed = (applicant) => {
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+
+const addNotification = async (data) => {
+    try {
+        const notification_id = uuidv4();
+
+        const sql = `
+            INSERT INTO notification (notification_id, notification_type, applicant_id) VALUES (?, ?, ?)
+        `;
+        const values = [notification_id, data.notification_type, data.applicant_id]
+
+        await pool.execute(sql, values);
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false
     }
 }
 
@@ -85,19 +98,29 @@ const updateStatusCronJob = () => {
 
     */
 
-    //runs everyday at midnight
-    cron.schedule("0 0 * * *", async () => {
-        console.log("scheduled job is runnning...");
-        const blacklistedApplicants = await getBlackListedApplicants();
 
-        //check
-        blacklistedApplicants.forEach(applicant => {
-            if (checkDateElapsed(applicant)) {
-                updateStatus(applicant);
-                //sent to notification
-                //sent email
-            }
-        });
+    //run every 10 seconds
+    cron.schedule("*/10 * * * * *", async () => {
+        console.log("scheduled job is runnning...");
+        try {
+            const blacklistedApplicants = await getBlackListedApplicants();
+
+            //check
+            blacklistedApplicants.forEach(applicant => {
+                if (checkDateElapsed(applicant)) {
+                    updateStatus(applicant);
+
+                    //sent to notification
+                    const data = { notification_type: "BLACKLISTED LIFTED", applicant_id: applicant.applicant_id }
+                    if (addNotification(data)){
+                        console.log("blacklisted status lifted");
+                    }
+                    
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
     });
 }
 
