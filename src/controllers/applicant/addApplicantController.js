@@ -59,6 +59,16 @@ const insertApplicant = async (applicant) => {
         ];
         await pool.execute(sql, values);
 
+
+        sql = `INSERT INTO ats_applicant_progress (progress_id, stage, status) VALUES (?, ?, ?)`;
+        values = [
+            progress_id, 
+            'PRE_SCREENING', 
+            'NONE'
+        ];
+
+        await pool.execute(sql, values);
+
         return true;
     } catch (error) {
         console.error("Error inserting applicant:", error);
