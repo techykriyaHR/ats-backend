@@ -40,8 +40,9 @@ updateStatusCronJob();
 //applicant
 const applicantRoutes = require('./routes/applicant/applicantRoutes');
 const addApplicantRoutes = require('./routes/applicant/addApplicantRoutes')
-//interview
 
+//interview
+const interviewRoutes = require('./routes/interview/interviewRoutes');
 //company
 
 //analytic
@@ -54,6 +55,9 @@ const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute')
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
 app.use('/counter', applicantCounterRoutes);
+app.use('/interview', interviewRoutes);
+
+
 
 app.post("/send-email", async (req, res) => {
     try {
