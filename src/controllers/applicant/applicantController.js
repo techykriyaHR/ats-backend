@@ -36,9 +36,8 @@ exports.getApplicantsFilter = async (req, res) => {
 
     console.log(filters);
     
-
     if (filters.month){
-        conditions.push("MONTH(a.date_created)= ?");
+        conditions.push("MONTHNAME(a.date_created)= ?");
         values.push(filters.month)
     }
     if (filters.year) {
@@ -50,8 +49,12 @@ exports.getApplicantsFilter = async (req, res) => {
         values.push(`%${filters.position}%`);
     }
     //then the status
-
-    //then overlap also to stages
+    if (filters.status) {
+        const statusArray = Array.isArray(filters.status) ? filters.status : [filters.status];
+        const placeholders = statusArray.map(() => "?").join(", ");
+        conditions.push(`p.status IN (${placeholders})`);
+        values.push(...statusArray);
+    }
 
     const sql = `
         SELECT
@@ -71,10 +74,6 @@ exports.getApplicantsFilter = async (req, res) => {
              ON t.position_id = j.job_id
         WHERE ${conditions.join(" AND ")}
     `;
-
-    console.log(conditions);
-    console.log(values);
-    
 
     const [results] = await pool.execute(sql, values);
 
