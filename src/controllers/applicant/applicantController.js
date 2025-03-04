@@ -17,6 +17,7 @@ exports.getAllApplicants = async (req, res) => {
             LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
             LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id;
         `;
+
         const [results] = await pool.execute(sql);
 
         if (results) {
@@ -28,8 +29,56 @@ exports.getAllApplicants = async (req, res) => {
 }
 
 // applicants/filter
-exports.getApplicantsFilter = (req, res) => {
-    const filter = req.body;
+exports.getApplicantsFilter = async (req, res) => {
+    const filters = req.query;
+    const conditions = [];
+    const values = [];
+
+    console.log(filters);
+    
+
+    if (filters.month){
+        conditions.push("MONTH(a.date_created)= ?");
+        values.push(filters.month)
+    }
+    if (filters.year) {
+        conditions.push("YEAR(a.date_created) = ?");
+        values.push(filters.year);
+    }
+    if (filters.position) {
+        conditions.push("j.title LIKE ?");
+        values.push(`%${filters.position}%`);
+    }
+    //then the status
+
+    //then overlap also to stages
+
+    const sql = `
+        SELECT
+            a.applicant_id, 
+            a.first_name, 
+            a.middle_name, 
+            a.last_name,
+            a.date_created, 
+            p.status, 
+            j.title
+        FROM ats_applicants a
+        LEFT JOIN ats_applicant_trackings t
+            ON a.applicant_id = t.applicant_id
+        LEFT JOIN ats_applicant_progress p 
+            ON t.progress_id = p.progress_id
+        LEFT JOIN sl_company_jobs j
+             ON t.position_id = j.job_id
+        WHERE ${conditions.join(" AND ")}
+    `;
+
+    console.log(conditions);
+    console.log(values);
+    
+
+    const [results] = await pool.execute(sql, values);
+
+    return res.json(results)
 }
 
 // applicants/:applicant_id
