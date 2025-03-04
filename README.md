@@ -77,3 +77,5 @@ We are using the `nodemailer` library to send email. We are using an email provi
             html: "<h1>sample</h1>",
         };
 ```
+
+# Deployment
