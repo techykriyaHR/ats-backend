@@ -76,7 +76,7 @@ const insertApplicant = async (applicant) => {
     }
 };
 
-//get applicants from database
+//get applicants from database. This gets the applicants info important only for comparison
 const getAllApplicants = async () => {
     const sql = `
         SELECT *
