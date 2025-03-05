@@ -5,6 +5,6 @@ const applicantCounterController = require('../../controllers/counter/applicantC
 //counts all 
 router.get("/", applicantCounterController.getApplicantCount)
 
-router.get("/try", applicantCounterController.tryAPI)
+router.post("/try", applicantCounterController.tryAPI)
 
 module.exports = router;

@@ -35,6 +35,8 @@ const transporter = nodemailer.createTransport({
 //applicant
 const applicantRoutes = require('./routes/applicant/applicantRoutes');
 const addApplicantRoutes = require('./routes/applicant/addApplicantRoutes')
+const editApplicantRoutes = require('./routes/applicant/editApplicantRoutes')
+const updateApplicantStatusRoutes = require('./routes/applicant/updateApplicantRoutes')
 //interview
 
 //company
@@ -48,6 +50,8 @@ const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute')
 // Routes
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
+app.use('/applicant/edit', editApplicantRoutes);
+app.use('/applicant/update/status', updateApplicantStatusRoutes);
 app.use('/counter', applicantCounterRoutes);
 
 app.post("/send-email", async (req, res) => {

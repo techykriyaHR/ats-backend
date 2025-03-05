@@ -54,7 +54,7 @@ exports.getApplicantCount =  async (req, res) => {
     const [results] = await pool.execute(sql);
 
     results.forEach(data => {
-        if (!positionFilter || positionFilter === "All" || data.title === positionFilter) {
+        if (!positionFilter || positionFilter == "All" || data.title == positionFilter) {
             const status = data.status;
             counter[stageMapping[status]] += 1;
             counter[stageCounter[status]] += 1;
@@ -80,14 +80,8 @@ exports.getApplicantCount =  async (req, res) => {
 
 
 exports.tryAPI = (req, res) => {
-    
-    const sql = "SELECT ats_applicant_trackings.tracking_id, ats_applicant_progress.stage,ats_applicant_progress.status, sl_company_jobs.title FROM ats_applicant_trackings INNER JOIN ats_applicant_progress ON ats_applicant_trackings.progress_id = ats_applicant_progress.progress_id INNER JOIN sl_company_jobs ON ats_applicant_trackings.position_id = sl_company_jobs.job_id"
-    conn.query(sql, (err, result) => {
-        if(err){
-            console.log(err)
-        }
-        else{
-            res.json(result)
-        }
-    })
+    const subject  = req.body
+    console.log(subject)
+    //console.log("subject is: " + subject)
+    res.json({"message": "try"})
 }
