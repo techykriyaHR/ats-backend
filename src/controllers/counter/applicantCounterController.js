@@ -1,268 +1,93 @@
-//the datas here are just dummies for testing
+//const pool =  require("../../config/db")
+var mysql = require('mysql2/promise')
 
-exports.getApplicantCount = (req, res) => {
-    const datas = [
-        { "id": 1, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 2, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 3, "stage": "In-Progress", "status": "First Interview Stage", "position": "Compliance Associate" },
-        { "id": 4, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Legal Researcher" },
-        { "id": 5, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 6, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 7, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 8, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 9, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 10, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 11, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 12, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 13, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 14, "stage": "Finished", "status": "Not Fit", "position": "IT Officer" },
-        { "id": 15, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 16, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 17, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 18, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 19, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 20, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 21, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 22, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 23, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 24, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 25, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 26, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 27, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 28, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 29, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 30, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 31, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 32, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 33, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 34, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 35, "stage": "Finished", "status": "Not Fit", "position": "Finance Operations Associate" },
-        { "id": 36, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 37, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 38, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 39, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 40, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 41, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 42, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 43, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 44, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 45, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 46, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 47, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 48, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 49, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 50, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 51, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 52, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 53, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 54, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 55, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 56, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 57, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 58, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 59, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 60, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 61, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 62, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 63, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 64, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 65, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 66, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 67, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 68, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 69, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 70, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 71, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 72, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 73, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 74, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 75, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 76, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 77, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 78, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 79, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 80, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 81, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 82, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 83, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 84, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 85, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 86, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 87, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 88, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 89, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 90, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 91, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 92, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 93, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 94, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 95, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 96, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 97, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 98, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 99, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 100, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" }
-    ] 
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'localdb',
+    waitForConnections: 10,
+    connectionLimit: 10,
+    port: 8889,
+    queueLimit: 0
+});
 
+
+exports.getApplicantCount =  async (req, res) => {
+    const positionFilter = req.query.position || "";
     const counter = {
-        "Sent Test": 0,
-        "Sent Interview Invitation": 0,
-        "First Interview Stage": 0,
-        "Second Interview Stage": 0, 
-        "Third Interview Stage": 0, 
-        "Fourth Interview Stage": 0,
-        "Final Interview Stage": 0, 
-        "Job Offer Sent": 0, 
-        "Job Offer Accepted": 0,
-        "Started Work": 0, 
-        "Job Offer Rejected": 0, 
-        "Withdrawn Application": 0,
-        "Not Fit": 0, 
-        "Abandoned": 0, 
-        "No Show": 0,
-        "Blacklisted": 0, 
-        "AWOL": 0, 
-        "For Hiring Decision": 0
-    }
+        "Test Sent": 0, "Interview Schedule Sent": 0, "First Interview Stage": 0, "Second Interview Stage": 0,
+        "Third Interview Stage": 0, "Fourth Interview Stage": 0, "Follow-up Interview Stage": 0, 
+        "For Job Offer": 0, "Job Offer Rejected": 0, "Job Offer Accepted": 0, "Withdrew Application": 0, 
+        "Blacklisted/Short-banned": 0, "Not Fit": 0, "Pre-Screening Stage": 0, "Interview Schedule Stage": 0, 
+        "Job Offer Stage": 0, "Unsuccessful Stage/Pool": 0
+    };
 
-    datas.forEach((data) => {
-        counter[data.status] += 1
-    })
+    const stageMapping = {
+        "TEST_SENT": "Test Sent", "INTERVIEW_SCHEDULE_SENT": "Interview Schedule Sent", 
+        "FIRST_INTERVIEW": "First Interview Stage", "SECOND_INTERVIEW": "Second Interview Stage",
+        "THIRD_INTERVIEW": "Third Interview Stage", "FOURTH_INTERVIEW": "Fourth Interview Stage",
+        "FOLLOW_UP_INTERVIEW": "Follow-up Interview Stage", "FOR_JOB_OFFER": "For Job Offer",
+        "JOB_OFFER_REJECTED": "Job Offer Rejected", "JOB_OFFER_ACCEPTED": "Job Offer Accepted",
+        "WITHDREW_APPLICATION": "Withdrew Application", "BLACKLISTED": "Blacklisted/Short-banned",
+        "NOT_FIT": "Not Fit"
+    };
 
-    res.json(counter)
-}
+    const stageCounter = {
+        "TEST_SENT": "Pre-Screening Stage", "INTERVIEW_SCHEDULE_SENT": "Interview Schedule Stage", 
+        "FIRST_INTERVIEW": "Interview Schedule Stage", "SECOND_INTERVIEW": "Interview Schedule Stage",
+        "THIRD_INTERVIEW": "Interview Schedule Stage", "FOURTH_INTERVIEW": "Interview Schedule Stage",
+        "FOLLOW_UP_INTERVIEW": "Interview Schedule Stage", "FOR_JOB_OFFER": "Job Offer Stage",
+        "JOB_OFFER_REJECTED": "Job Offer Stage", "JOB_OFFER_ACCEPTED": "Job Offer Stage",
+        "WITHDREW_APPLICATION": "Unsuccessful Stage/Pool", "BLACKLISTED": "Unsuccessful Stage/Pool",
+        "NOT_FIT": "Unsuccessful Stage/Pool"
+    };
 
-exports.filterApplicantCount = (req, res) => {
-    const datas = [
-        { "id": 1, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 2, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 3, "stage": "In-Progress", "status": "First Interview Stage", "position": "Compliance Associate" },
-        { "id": 4, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Legal Researcher" },
-        { "id": 5, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 6, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 7, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 8, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 9, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 10, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 11, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 12, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 13, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 14, "stage": "Finished", "status": "Not Fit", "position": "IT Officer" },
-        { "id": 15, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 16, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 17, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 18, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 19, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 20, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 21, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 22, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 23, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 24, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 25, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 26, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 27, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 28, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 29, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 30, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 31, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 32, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 33, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 34, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 35, "stage": "Finished", "status": "Not Fit", "position": "Finance Operations Associate" },
-        { "id": 36, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 37, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 38, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 39, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 40, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 41, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 42, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 43, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 44, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 45, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 46, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 47, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 48, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 49, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 50, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 51, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 52, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 53, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 54, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 55, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 56, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 57, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 58, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 59, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 60, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 61, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 62, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 63, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 64, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 65, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 66, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 67, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 68, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 69, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 70, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 71, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 72, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 73, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 74, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 75, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 76, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 77, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 78, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 79, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 80, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 81, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 82, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" },
-        { "id": 83, "stage": "Finished", "status": "Job Offer Rejected", "position": "Legal Researcher" },
-        { "id": 84, "stage": "Finished", "status": "Withdrawn Application", "position": "Compliance Manager" },
-        { "id": 85, "stage": "Finished", "status": "Not Fit", "position": "Business Operations Associate" },
-        { "id": 86, "stage": "Finished", "status": "Abandoned", "position": "IT Officer" },
-        { "id": 87, "stage": "Finished", "status": "No Show", "position": "Compliance Associate" },
-        { "id": 88, "stage": "Finished", "status": "Blacklisted", "position": "Software Engineer" },
-        { "id": 89, "stage": "Finished", "status": "AWOL", "position": "Finance Operations Associate" },
-        { "id": 90, "stage": "Finished", "status": "For Hiring Decision", "position": "Associate Manager Business Operations" },
-        { "id": 91, "stage": "For Processing", "status": "Sent Test", "position": "IT Officer" },
-        { "id": 92, "stage": "For Processing", "status": "Sent Interview Invitation", "position": "Software Engineer" },
-        { "id": 93, "stage": "In-Progress", "status": "First Interview Stage", "position": "Legal Researcher" },
-        { "id": 94, "stage": "In-Progress", "status": "Second Interview Stage", "position": "Compliance Associate" },
-        { "id": 95, "stage": "In-Progress", "status": "Third Interview Stage", "position": "Finance Operations Associate" },
-        { "id": 96, "stage": "In-Progress", "status": "Fourth Interview Stage", "position": "Business Operations Associate" },
-        { "id": 97, "stage": "In-Progress", "status": "Final Interview Stage", "position": "Compliance Manager" },
-        { "id": 98, "stage": "Wrapped Up", "status": "Job Offer Sent", "position": "Associate Manager Business Operations" },
-        { "id": 99, "stage": "Wrapped Up", "status": "Job Offer Accepted", "position": "IT Officer" },
-        { "id": 100, "stage": "Finished", "status": "Started Work", "position": "Software Engineer" }
-    ] 
+    const sql = `
+        SELECT ats_applicant_trackings.tracking_id, ats_applicant_progress.stage, 
+                ats_applicant_progress.status, sl_company_jobs.title
+        FROM ats_applicant_trackings
+        INNER JOIN ats_applicant_progress ON ats_applicant_trackings.progress_id = ats_applicant_progress.progress_id
+        INNER JOIN sl_company_jobs ON ats_applicant_trackings.position_id = sl_company_jobs.job_id
+    `;
 
-    const counter = {
-        "Sent Test": 0,
-        "Sent Interview Invitation": 0,
-        "First Interview Stage": 0,
-        "Second Interview Stage": 0, 
-        "Third Interview Stage": 0, 
-        "Fourth Interview Stage": 0,
-        "Final Interview Stage": 0, 
-        "Job Offer Sent": 0, 
-        "Job Offer Accepted": 0,
-        "Started Work": 0, 
-        "Job Offer Rejected": 0, 
-        "Withdrawn Application": 0,
-        "Not Fit": 0, 
-        "Abandoned": 0, 
-        "No Show": 0,
-        "Blacklisted": 0, 
-        "AWOL": 0, 
-        "For Hiring Decision": 0
-    }
+    const [results] = await pool.execute(sql);
 
-    const positionFilter = req.params.filter
+    results.forEach(data => {
+        if (!positionFilter || positionFilter === "All" || data.title === positionFilter) {
+            const status = data.status;
+            counter[stageMapping[status]] += 1;
+            counter[stageCounter[status]] += 1;
+        }
+    });
 
-    datas.forEach((data) => {
-        if (data.position == positionFilter) {
-           counter[data.status] += 1 
+    res.json(counter);
+    
+    // conn.query(sql, (err, result) => {
+    //     if (err) return res.status(500).json({ error: "Database query failed" });
+
+    //     result.forEach(data => {
+    //         if (!positionFilter || positionFilter === "All" || data.title === positionFilter) {
+    //             const status = data.status;
+    //             counter[stageMapping[status]] += 1;
+    //             counter[stageCounter[status]] += 1;
+    //         }
+    //     });
+
+    //     res.json(counter);
+    // });
+};
+
+
+exports.tryAPI = (req, res) => {
+    
+    const sql = "SELECT ats_applicant_trackings.tracking_id, ats_applicant_progress.stage,ats_applicant_progress.status, sl_company_jobs.title FROM ats_applicant_trackings INNER JOIN ats_applicant_progress ON ats_applicant_trackings.progress_id = ats_applicant_progress.progress_id INNER JOIN sl_company_jobs ON ats_applicant_trackings.position_id = sl_company_jobs.job_id"
+    conn.query(sql, (err, result) => {
+        if(err){
+            console.log(err)
+        }
+        else{
+            res.json(result)
         }
     })
-    res.json(counter)
 }

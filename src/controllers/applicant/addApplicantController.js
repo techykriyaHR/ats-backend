@@ -1,9 +1,9 @@
-const pool = require("./config/db");
+// const pool = require("./config/db");
 
 //insert
-const insertApplicant = (applicant) => {
-    pool
-}
+// const insertApplicant = (applicant) => {
+//     pool
+// }
 
 //get applicants from database
 
