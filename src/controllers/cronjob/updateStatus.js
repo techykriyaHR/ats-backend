@@ -21,7 +21,6 @@ const getBlackListedApplicants = async () => {
     }
 }
 
-
 const updateStatus = async (applicant) => {
     try {
         const sql = `
