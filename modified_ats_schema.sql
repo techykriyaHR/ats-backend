@@ -80,10 +80,16 @@ CREATE TABLE `ats_applicant_interviews` (
 CREATE TABLE `ats_interviews_notes` (
   `note_id` char(36) PRIMARY KEY NOT NULL,
   `interview_id` char(36) NOT NULL,
-  `note_type` ENUM ('First Interview', 'Second Interview', 'Third Interview', 'Fourth Interview', 'Follow-Up Interview') NOT NULL,
-  `note_body` text DEFAULT NULL,
+  `note_type` ENUM (  'DISCUSSION', 
+  'FIRST INTERVIEW', 
+  'SECOND INTERVIEW', 
+  'THIRD INTERVIEW', 
+  'FOURTH INTERVIEW', 
+  'FOLLOW-UP INTERVIEW') NOT NULL,
+  `note_body` text NOT NULL,
   `noted_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE `hris_user_accounts` (
   `user_id` char(36) PRIMARY KEY NOT NULL,
