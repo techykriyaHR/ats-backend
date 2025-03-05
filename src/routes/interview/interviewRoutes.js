@@ -9,7 +9,8 @@ router.post('/', interviewController.addInterview);
 // /interview - get
 router.get('/', interviewController.getInterview)
 
-//router.route('/').get(interviewController.getInterview).post(interviewController.addInterview);
-router.put('/', interviewController.addNote);
+router.post('/note', interviewController.addNote)
+
+router.put('/note', interviewController.editNote);
 
 module.exports = router;
