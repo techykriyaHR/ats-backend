@@ -20,11 +20,13 @@
   },
   "homepage": "https://github.com/kriyahr/ats-backend#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "method-override": "^3.0.0",
     "mysql2": "^3.12.0",
     "node-cron": "^3.0.3",
