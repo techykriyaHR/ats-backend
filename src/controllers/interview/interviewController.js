@@ -75,14 +75,14 @@ exports.addNote = async (req, res) => {
         const interview = req.body;
 
         const sql = `
-            UPDATE ats_interviews_notes (note_body) 
-            VALUES (?)
+            UPDATE ats_interviews_notes
+            SET note_body = ?
             WHERE note_id = ?
         `;
         const values = [interview.note_body, interview.note_id];
         await pool.execute(sql, values);
 
-        res.status(201).json({ message: "interview added" });
+        res.status(201).json({ message: "interview note added" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error });
