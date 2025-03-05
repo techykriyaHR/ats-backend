@@ -28,7 +28,8 @@ const registerRoutes = require("./routes/auth/registerRoutes");
 //applicant
 const applicantRoutes = require('./routes/applicant/applicantRoutes');
 const addApplicantRoutes = require('./routes/applicant/addApplicantRoutes')
-
+const editApplicantRoutes = require('./routes/applicant/editApplicantRoutes')
+const updateApplicantStatusRoutes = require('./routes/applicant/updateApplicantRoutes')
 //interview
 const interviewRoutes = require('./routes/interview/interviewRoutes');
 
@@ -42,6 +43,8 @@ const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute')
 // Routes
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
+app.use('/applicant/edit', editApplicantRoutes);
+app.use('/applicant/update/status', updateApplicantStatusRoutes);
 app.use('/counter', applicantCounterRoutes);
 app.use('/interview', interviewRoutes);
 app.use('/auth', loginRoutes);
