@@ -8,9 +8,9 @@ exports.addInterview = async (req, res) => {
         const interview_id = uuidv4();
         const note_id = uuidv4();
 
-        const sql = `INSERT INTO ats_applicant_interviews (interview_id, tracking_id, interviewer_id, date_of_interview)
+        let sql = `INSERT INTO ats_applicant_interviews (interview_id, tracking_id, interviewer_id, date_of_interview)
                      VALUES (?, ?, ?, ?)`;
-        const values = [interview_id, interview.tracking_id, interview.interviewer_id, interview.date_of_interview];
+        let values = [interview_id, interview.tracking_id, interview.interviewer_id, interview.date_of_interview];
         await pool.execute(sql, values);
 
         
@@ -18,7 +18,7 @@ exports.addInterview = async (req, res) => {
             INSERT INTO ats_interviews_notes (note_id, interview_id, note_type)
             VALUES (?, ?, ?)
         `;
-        values = [note_id, interview.interview_id, interview.note_type];
+        values = [note_id, interview_id, interview.note_type];
         await pool.execute(sql, values);
 
         res.status(201).json({ message: "interview added" });
