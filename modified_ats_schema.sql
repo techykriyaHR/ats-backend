@@ -31,7 +31,7 @@ CREATE TABLE `ats_applicant_trackings` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_by` char(36) NOT NULL,
   `applied_source` ENUM ('INDEED', 'LINKEDIN', 'SOCIAL_MEDIA', 'SUITELIFE', 'WALK_IN', 'REFERRAL') DEFAULT NULL,
-  `referrer_id` char(36) DEFAULT NULL,
+  `referrer_name` varchar(50) DEFAULT NULL,
   `company_id` char(36) NOT NULL,
   `position_id` char(36) NOT NULL
 );
@@ -89,7 +89,6 @@ CREATE TABLE `ats_interviews_notes` (
   `note_body` text NOT NULL,
   `noted_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 
 CREATE TABLE `hris_user_accounts` (
   `user_id` char(36) PRIMARY KEY NOT NULL,
