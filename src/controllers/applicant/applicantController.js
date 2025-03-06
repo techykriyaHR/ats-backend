@@ -64,11 +64,12 @@ exports.getApplicantsFilter = async (req, res) => {
             a.last_name,
             a.date_created, 
             p.status, 
-            j.title
+            j.title, 
+            p.progress_id
         FROM ats_applicants a
         LEFT JOIN ats_applicant_trackings t
             ON a.applicant_id = t.applicant_id
-        LEFT JOIN ats_applicant_progress p 
+        LEFT JOIN ats_applicant_progress p
             ON t.progress_id = p.progress_id
         LEFT JOIN sl_company_jobs j
              ON t.position_id = j.job_id
@@ -121,6 +122,7 @@ exports.getApplicant = async (req, res) => {
                 t.applied_source,
                 t.referrer_id,
                 
+                p.progress_id,
                 p.stage,
                 p.status,
                 p.blacklisted_type,
