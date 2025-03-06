@@ -44,7 +44,7 @@ const insertApplicant = async (applicant) => {
         await pool.execute(sql, values);
 
         // Insert into applicants_trackings
-        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
+        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_name, company_id, position_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
@@ -53,7 +53,7 @@ const insertApplicant = async (applicant) => {
             applicant.created_by,
             applicant.updated_by,
             applicant.applied_source || null,
-            applicant.referrer_id || null,
+            applicant.referrer_name || null,
             applicant.company_id,
             applicant.position_id
         ];

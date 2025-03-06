@@ -86,15 +86,6 @@ exports.getApplicant = async (req, res) => {
     try {
         const applicant_id = req.params.applicant_id;
 
-        // const sql = `
-        //     SELECT * 
-        //     FROM ats_contact_infos
-        //     INNER JOIN ats_applicants USING (contact_id)
-        //     INNER JOIN ats_applicant_trackings USING (applicant_id)
-        //     INNER JOIN ats_applicant_progress USING (progress_id)
-        //     WHERE applicant_id = ?;
-        // `;
-
         const sql = `
             SELECT 
                 a.applicant_id,
@@ -120,7 +111,7 @@ exports.getApplicant = async (req, res) => {
                 t.updated_at AS tracking_updated_at,
                 t.updated_by AS tracking_updated_by,
                 t.applied_source,
-                t.referrer_id,
+                t.referrer_name,
                 
                 p.progress_id,
                 p.stage,
@@ -152,7 +143,6 @@ exports.getApplicant = async (req, res) => {
 
             LEFT JOIN sl_company_jobs j
                 ON t.position_id = j.job_id
-
             WHERE a.applicant_id = ?;
         `;
 
