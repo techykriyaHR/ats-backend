@@ -35,6 +35,7 @@ const interviewRoutes = require('./routes/interview/interviewRoutes');
 //company
 
 //analytic
+const metricRoutes = require('./routes/analytic/metricsRoutes');
 
 //counter
 const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute');
@@ -50,6 +51,7 @@ app.use('/interview', interviewRoutes);
 app.use('/auth', loginRoutes);
 app.use('/auth', registerRoutes);
 app.use('/notification', notificationRoutes);
+app.use('/analytic/metrics', metricRoutes);
 
 const verifyToken = require("./middlewares/verifyToken");
 
@@ -59,6 +61,10 @@ app.get('/protected', verifyToken, (req, res) => {
     console.log(user_email);
     
     res.json({message: "okay"});
+});
+
+app.get("/test", (req, res) => {
+    res.json({message: "okay"})
 })
 
 module.exports = app;
