@@ -7,11 +7,13 @@ const generalNotification = async () => {
             a.first_name,
             a.middle_name,
             a.last_name,
-            a.gender,
-            a.birth_date,
-            a.discovered_at
+            t.created_at AS date_applied,
+            j.title
         FROM ats_notifications n
         LEFT JOIN ats_applicants a ON n.applicant_id = a.applicant_id
+        LEFT JOIN  ats_applicant_trackings t ON a.applicant_id = t.applicant_id
+        LEFT JOIN sl_company_jobs j ON j.job_id = t.position_id
+        WHERE n.is_viewed = 0
         ORDER BY n.created_at DESC
         LIMIT 20
     `;
@@ -27,12 +29,17 @@ const generalNotification = async () => {
 
 const atsHealthCheckNotification = async () => {
     const sql = `
-        SELECT a.*
+        SELECT a.*, 
+            t.updated_at,
+            j.title, 
+            p.stage, 
+            p.status 
         FROM ats_applicants a
         JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
-        WHERE t.updated_at < NOW() - INTERVAL 10 DAY
+        LEFT JOIN sl_company_jobs j ON j.job_id = t.position_id
+        LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
+        WHERE t.updated_at < NOW() - INTERVAL 3 DAY
     `;
-
     try {
         const [rows] = await pool.query(sql);
         return rows;
