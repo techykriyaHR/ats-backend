@@ -1,16 +1,8 @@
 const pool = require("../../config/db");
 const transporter = require("../../config/transporter");
 
-exports.emailApplicant = async (req, res) => {
-    try {
-        const { applicant_id, email_subject, email_body } = req.body;
-
-        if (!applicant_id || !email_subject || !email_body) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        //  applicant info and interviewer details
-        const sql = `
+const getApplicantInfo = async (applicant_id) => {
+    const sql = `
             SELECT 
                 a.applicant_id,
                 a.first_name AS applicant_first_name,
@@ -28,22 +20,43 @@ exports.emailApplicant = async (req, res) => {
             FROM ats_applicants a
             JOIN ats_contact_infos c ON a.contact_id = c.contact_id
             WHERE a.applicant_id = ?;
-        `;
+    `;
 
-        const [results] = await pool.execute(sql, [applicant_id]);
-        console.log(results);
-        
-        if (!results.length) {
-            return res.status(404).json({ message: "Applicant not found" });
+    const [results] = await pool.execute(sql, [applicant_id]);
+    return results[0];
+}
+
+const getUserInfo = async (user_id) => {
+    try {
+        const sql = `
+            SELECT
+                a.*,
+                i.*
+            FROM hris_user_accounts a
+            INNER JOIN hris_user_infos i ON a.user_id = i.user_id
+            WHERE a.user_id = ?;
+        `;
+        const [results] = await pool.execute(sql, [user_id]);
+        return results[0];
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+
+}
+
+
+exports.emailApplicant = async (req, res) => {
+    try {
+        const { applicant_id, user_id, email_subject, email_body } = req.body;
+
+        if (!applicant_id || !email_subject || !email_body) {
+            return res.status(400).json({ message: "Missing required fields" });
         }
-        
-        const applicantData = results[0];
+
+        const applicantData = getApplicantInfo(applicant_id);
+        const userData = getUserInfo(user_id);
 
         const recipientEmails = [applicantData.email_1, applicantData.email_2, applicantData.email_3].filter(Boolean);
-
-        if (!recipientEmails.length) {
-            return res.status(400).json({ message: "No valid recipient emails found" });
-        }
 
         // config of email message
         const mailOptions = {
@@ -54,7 +67,6 @@ exports.emailApplicant = async (req, res) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log(`Email sent: ${info.response}`);
 
         res.status(200).json({ message: "Email sent successfully", info: info.response });
     } catch (error) {
