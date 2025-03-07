@@ -53,7 +53,7 @@ const emailSignature = (userData) => {
     const contactNumber = userData.contact_number ? `📞 ${userData.contact_number}` : "";
     const email = userData.personal_email ? `✉️ <a href="mailto:${userData.personal_email}" style="color: #007bff;">${userData.personal_email}</a>` : "";
     const brandLogo = "https://media.licdn.com/dms/image/v2/D560BAQEDGebOpuJviQ/company-logo_200_200/company-logo_200_200/0/1690116252637/fullsuite_logo?e=2147483647&v=beta&t=o2nd-4DNYXQwJccynu5kw2Rv0tcd4yq_r8lXf_NQlak"; // Placeholder for company logo
-    
+
     return `
         <div style="font-family: Arial, sans-serif; color: #333; padding: 10px; border-top: 2px solid #007bff;">
             <div style="display: flex; align-items: center;">
@@ -68,7 +68,6 @@ const emailSignature = (userData) => {
         </div>
     `;
 };
-
 
 exports.emailApplicant = async (req, res) => {
     try {
@@ -101,7 +100,41 @@ exports.emailApplicant = async (req, res) => {
         console.error("Error sending email:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
+};
 
-    // const userInfo = await getUserInfo(req.body.user_id);
-    // res.json(userInfo)
+exports.emailApplicantWithFile = async (req, res) => {
+    try {
+        let { applicant_id, user_id, email_subject, email_body } = req.body;
+
+        if (!applicant_id || !email_subject || !email_body) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        const applicantData = await getApplicantInfo(applicant_id);
+        const userData = await getUserInfo(user_id);
+
+        const recipientEmails = [applicantData.email_1, applicantData.email_2, applicantData.email_3].filter(Boolean);
+        const emailSignatureString = emailSignature(userData);
+        email_body = email_body + emailSignatureString;
+
+        // Create mail options
+        const mailOptions = {
+            from: `"FullSuite" <${process.env.EMAIL_USER}>`,
+            to: recipientEmails,
+            subject: email_subject,
+            html: email_body,
+            attachments: req.file ? [{
+                filename: req.file.originalname,
+                content: req.file.buffer, 
+            }] : [],
+        };
+
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: "Email sent successfully", info: info.response });
+    } catch (error) {
+        console.error("Error sending email:", error);
+        res.status(500).json({ message: "Internal server error", error: error.message });
+    }
 };
