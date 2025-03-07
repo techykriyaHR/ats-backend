@@ -11,7 +11,14 @@ exports.register = async (req, res) => {
         const {user_email, user_password} = req.body;
         const user_id = uuidv4();
         const hashedPassword = await bcrypt.hash(user_password, 10);
-        const user_key = "123";
+
+      
+
+
+        // const user_key = "123";
+
+    
+         const user_key = Math.random().toString(36).slice(-8);
     
         const sql = `
             INSERT INTO hris_user_accounts (user_id, user_email, user_password, user_key, created_at)

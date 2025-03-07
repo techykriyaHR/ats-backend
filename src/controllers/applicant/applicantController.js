@@ -96,62 +96,46 @@ exports.getApplicant = async (req, res) => {
 
         const sql = `
             SELECT 
-                a.applicant_id,
-                a.first_name,
-                a.middle_name,
-                a.last_name,
-                a.gender,
-                a.birth_date,
-                a.discovered_at,
-                a.cv_link,
-                a.date_created AS applicant_created_at,
-                
-                c.mobile_number_1,
-                c.mobile_number_2,
-                c.email_1,
-                c.email_2,
-                c.email_3,
-                
-                t.tracking_id,
-                t.test_result,
-                t.created_at AS tracking_created_at,
-                t.created_by AS tracking_created_by,
-                t.updated_at AS tracking_updated_at,
-                t.updated_by AS tracking_updated_by,
-                t.applied_source,
-                t.referrer_id,
-                
-                p.stage,
-                p.status,
-                p.blacklisted_type,
-                p.reason,
-                p.updated_at AS progress_updated_at,
-                
-                j.job_id,
-                j.title AS job_title,
-                j.description AS job_description,
-                j.employment_type,
-                j.is_open AS job_is_open,
-                j.created_at AS job_created_at,
-                j.created_by AS job_created_by,
-                j.updated_at AS job_updated_at,
-                j.updated_by AS job_updated_by
-
-            FROM ats_applicants a
-
-            LEFT JOIN ats_contact_infos c
-                ON a.contact_id = c.contact_id
-
-            LEFT JOIN ats_applicant_trackings t
-                ON a.applicant_id = t.applicant_id
-
-            LEFT JOIN ats_applicant_progress p
-                ON t.progress_id = p.progress_id
-
-            LEFT JOIN sl_company_jobs j
-                ON t.position_id = j.job_id
-
-            WHERE a.applicant_id = ?;
+    a.applicant_id,
+    a.first_name,
+    a.middle_name,
+    a.last_name,
+    a.gender,
+    a.birth_date,
+    a.discovered_at,
+    a.cv_link,
+    a.date_created AS applicant_created_at,
+    c.mobile_number_1,
+    c.mobile_number_2,
+    c.email_1,
+    c.email_2,
+    c.email_3,
+    t.tracking_id,
+    t.test_result,
+    t.created_at AS tracking_created_at,
+    t.created_by AS tracking_created_by,
+    t.updated_at AS tracking_updated_at,
+    t.updated_by AS tracking_updated_by,
+    t.applied_source,
+    t.referrer_id,
+    p.stage,
+    p.status,
+    p.blacklisted_type,
+    p.reason,
+    p.updated_at AS progress_updated_at,
+    j.job_id,
+    j.title AS job_title,
+    j.description AS job_description,
+    j.employment_type,
+    j.is_open AS job_is_open,
+    j.created_at AS job_created_at,
+    j.created_by AS job_created_by
+FROM ats_applicants a
+LEFT JOIN ats_contact_infos c ON a.contact_id = c.contact_id
+LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
+LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
+LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id
+WHERE a.applicant_id = ?;
         `;
 
         const values = [applicant_id];
