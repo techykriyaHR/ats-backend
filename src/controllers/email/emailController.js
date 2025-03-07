@@ -39,24 +39,52 @@ const getUserInfo = async (user_id) => {
         const [results] = await pool.execute(sql, [user_id]);
         return results[0];
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 
 }
 
+const emailSignature = (userData) => {
+    // This returns formatted HTML data for the footer. 
+    const fullName = `${userData.first_name} ${userData.last_name}`;
+    const jobTitle = "HR Representative"; // Assuming title since it's not in data
+    const companyName = "Example Inc.";
+    const companyWebsite = "https://example.com";
+    const contactNumber = userData.contact_number ? `📞 ${userData.contact_number}` : "";
+    const email = userData.personal_email ? `✉️ <a href="mailto:${userData.personal_email}" style="color: #007bff;">${userData.personal_email}</a>` : "";
+    const brandLogo = "https://media.licdn.com/dms/image/v2/D560BAQEDGebOpuJviQ/company-logo_200_200/company-logo_200_200/0/1690116252637/fullsuite_logo?e=2147483647&v=beta&t=o2nd-4DNYXQwJccynu5kw2Rv0tcd4yq_r8lXf_NQlak"; // Placeholder for company logo
+    
+    return `
+        <div style="font-family: Arial, sans-serif; color: #333; padding: 10px; border-top: 2px solid #007bff;">
+            <div style="display: flex; align-items: center;">
+                <img src="${brandLogo}" alt="Company Logo" width="80" height="80" style="border-radius: 10px; margin-right: 15px;">
+                <div>
+                    <p style="margin: 5px 0; font-size: 14px;"><strong>${fullName}</strong></p>
+                    <p style="margin: 5px 0; font-size: 14px;">${jobTitle} | <a href="${companyWebsite}" style="color: #007bff; text-decoration: none;">${companyName}</a></p>
+                    <p style="margin: 5px 0; font-size: 14px;">${contactNumber} ${email}</p>
+                    <p style="font-size: 12px; color: #777; margin-top: 10px;">Confidentiality Notice: This email and any attachments are confidential.</p>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
 
 exports.emailApplicant = async (req, res) => {
     try {
-        const { applicant_id, user_id, email_subject, email_body } = req.body;
+        let { applicant_id, user_id, email_subject, email_body } = req.body;
 
         if (!applicant_id || !email_subject || !email_body) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        const applicantData = getApplicantInfo(applicant_id);
-        const userData = getUserInfo(user_id);
+        const applicantData = await getApplicantInfo(applicant_id);
+        const userData = await getUserInfo(user_id);
 
         const recipientEmails = [applicantData.email_1, applicantData.email_2, applicantData.email_3].filter(Boolean);
+        const emailSignatureString = emailSignature(userData);
+
+        email_body = email_body + emailSignatureString;
 
         // config of email message
         const mailOptions = {
@@ -73,4 +101,7 @@ exports.emailApplicant = async (req, res) => {
         console.error("Error sending email:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
+
+    // const userInfo = await getUserInfo(req.body.user_id);
+    // res.json(userInfo)
 };
