@@ -102,7 +102,7 @@ exports.emailApplicant = async (req, res) => {
     }
 };
 
-exports.emailApplicantWithFile = async (req, res) => {
+exports.emailApplicantWithFiles = async (req, res) => {
     try {
         let { applicant_id, user_id, email_subject, email_body } = req.body;
 
@@ -117,16 +117,19 @@ exports.emailApplicantWithFile = async (req, res) => {
         const emailSignatureString = emailSignature(userData);
         email_body = email_body + emailSignatureString;
 
+        const attachments = req.files?.map(file => ({
+            filename: file.originalname,
+            content: file.buffer, 
+        })) || []; 
+
         // Create mail options
         const mailOptions = {
             from: `"FullSuite" <${process.env.EMAIL_USER}>`,
             to: recipientEmails,
             subject: email_subject,
             html: email_body,
-            attachments: req.file ? [{
-                filename: req.file.originalname,
-                content: req.file.buffer, 
-            }] : [],
+            attachments: attachments, 
+           
         };
 
         // Send email
