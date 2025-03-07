@@ -35,6 +35,7 @@ const updateStatusRoutes = require('./routes/applicant/updateStatusRoutes')
 const interviewRoutes = require('./routes/interview/interviewRoutes');
 
 //company
+const positionRoutes = require('./routes/company/positionRoutes');
 
 //analytic
 const metricRoutes = require('./routes/analytic/metricsRoutes');
@@ -62,6 +63,7 @@ app.use('/notification', notificationRoutes);
 app.use('/analytic/metrics', metricRoutes);
 app.use('/analytic/graphs', graphsRoutes);
 app.use('/email', emailRoutes);
+app.use('/company', positionRoutes);
 
 const verifyToken = require("./middlewares/verifyToken");
 
