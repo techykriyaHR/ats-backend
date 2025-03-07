@@ -46,6 +46,9 @@ const applicantCounterRoutes = require('./routes/counter/applicantCounterRoute')
 //notification
 const notificationRoutes = require("./routes/notification/notificationRoutes");
 
+//email
+const emailRoutes = require('./routes/email/emailRoutes');
+
 // Routes
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
@@ -58,6 +61,7 @@ app.use('/auth', registerRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/analytic/metrics', metricRoutes);
 app.use('/analytic/graphs', graphsRoutes);
+app.use('/email', emailRoutes);
 
 const verifyToken = require("./middlewares/verifyToken");
 
