@@ -25,7 +25,7 @@ const getUserInfoSQL = `
 exports.getUserInfo = async (req, res) => {
     console.log(req.user);
 
-    const user_id = req.user.user_id; // Assuming user_id is available in req.user after authentication
+    const user_id = req.user.user_id; 
 
     try {
         const values = [user_id];
