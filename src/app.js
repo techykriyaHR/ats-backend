@@ -34,6 +34,9 @@ const interviewRoutes = require('./routes/interview/interviewRoutes');
 
 // company
 
+//company
+const positionRoutes = require('./routes/company/positionRoutes');
+
 // analytic
 
 // counter
@@ -54,6 +57,7 @@ app.use('/auth', loginRoutes);
 app.use('/auth', registerRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/user', userRoutes);
+app.use('/company', positionRoutes);
 
 const verifyToken = require("./middlewares/verifyToken");
 
