@@ -4,6 +4,7 @@ const updateStatus = async (progress_id, status) => {
 
     converted_status = status.toUpperCase().replace(/ /g, "_")
 
+    // get the corresponding stage based on status. 
     let stage = updateStage(converted_status)
 
     try {
@@ -48,8 +49,7 @@ const updateStage = (status) => {
 }
 
 exports.updateApplicantStatus = async (req, res) => {
-    const progress_id = req.body.progress_id;
-    const status = req.body.status;
+    const {progress_id, status } = req.body;
 
     const isSuccess = await updateStatus(progress_id, status);
     if (isSuccess) {

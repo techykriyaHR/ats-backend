@@ -44,12 +44,13 @@ const insertApplicant = async (applicant) => {
         await pool.execute(sql, values);
 
         // Insert into applicants_trackings
-        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_name, company_id, position_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_at, created_by, updated_by, applied_source, referrer_name, company_id, position_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
             applicant_id,
             progress_id,
+            applicant.created_at || new Date(),
             applicant.created_by,
             applicant.updated_by,
             applicant.applied_source || null,
@@ -71,7 +72,7 @@ const insertApplicant = async (applicant) => {
 
         return true;
     } catch (error) {
-        console.error("Error inserting applicant:", error);
+        console.error("Error inserting applicant:", error.message);
         return false;
     }
 };
@@ -168,7 +169,7 @@ exports.checkDuplicates =  async (req, res) => {
 //We first check whether duplicates exist using checkDuplicates controller. 
 //If it is false, we proceed to add it on using addApplicant controller. 
 exports.addApplicant = async (req, res) => {
-    const applicant = JSON.parse(req.body.applicant);
+    const applicant = req.body;
 
     const isSuccess = await insertApplicant(applicant);
     if (isSuccess) {
