@@ -42,9 +42,9 @@ const getUserInfo = async (user_id) => {
         const [results] = await pool.execute(sql, [user_id]);
         return results[0];
     } catch (error) {
-        console.log(error.message );
+        console.log(error.message);
         return [];
-        
+
     }
 
 }
@@ -87,59 +87,25 @@ exports.emailApplicant = async (req, res) => {
 
         const recipientEmails = [applicantData.email_1, applicantData.email_2, applicantData.email_3].filter(Boolean);
         const emailSignatureString = emailSignature(userData);
-
         email_body = email_body + emailSignatureString;
 
-        // config of email message
+        const attachments = req.files ? req.files.map(file => ({
+            filename: file.originalname,
+            content: file.buffer,
+        })) : [];
+
+        // Create mail options
         const mailOptions = {
             from: `"FullSuite" <${userData.user_email}>`,
             to: recipientEmails,
             subject: email_subject,
             html: email_body,
-        }; 
-        
-        //create transporter
-        const transporter = createTransporter({email_user: userData.user_email, email_pass: userData.app_password})
-        const info = await transporter.sendMail(mailOptions);
-        
-        res.status(200).json({ message: "Email sent successfully", info: info.response });
-    } catch (error) {
-        console.error("Error sending email:", error);
-        res.status(500).json({ message: "Internal server error", error: error.message });
-    }
-};
+            attachments: attachments,
 
-exports.emailApplicantWithFiles = async (req, res) => {
-    try {
-        let { applicant_id, user_id, email_subject, email_body } = req.body;
-
-        if (!applicant_id || !email_subject || !email_body) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const applicantData = await getApplicantInfo(applicant_id);
-        const userData = await getUserInfo(user_id);
-
-        const recipientEmails = [applicantData.email_1, applicantData.email_2, applicantData.email_3].filter(Boolean);
-        const emailSignatureString = emailSignature(userData);
-        email_body = email_body + emailSignatureString;
-
-        const attachments = req.files?.map(file => ({
-            filename: file.originalname,
-            content: file.buffer, 
-        })) || []; 
-
-        // Create mail options
-        const mailOptions = {
-            from: `"FullSuite" <${process.env.EMAIL_USER}>`,
-            to: recipientEmails,
-            subject: email_subject,
-            html: email_body,
-            attachments: attachments, 
-           
         };
 
-        // Send email
+        //create transporter
+        const transporter = createTransporter({ email_user: userData.user_email, email_pass: userData.app_password })
         const info = await transporter.sendMail(mailOptions);
 
         res.status(200).json({ message: "Email sent successfully", info: info.response });

@@ -7,8 +7,6 @@ const upload = multer({ storage });
 
 const emailController = require("../../controllers/email/emailController");
 
-router.post("/applicant", emailController.emailApplicant);
-
-router.post("/applicant/with-files", upload.array('files', 10) , emailController.emailApplicantWithFiles);
+router.post("/applicant", upload.array('files', 10) , emailController.emailApplicant);
 
 module.exports = router;
