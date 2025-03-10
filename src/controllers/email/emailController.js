@@ -1,5 +1,5 @@
 const pool = require("../../config/db");
-const transporter = require("../../config/transporter");
+const createTransporter = require("../../config/transporter");
 
 const getApplicantInfo = async (applicant_id) => {
     const sql = `
@@ -31,15 +31,20 @@ const getUserInfo = async (user_id) => {
         const sql = `
             SELECT
                 a.*,
-                i.*
+                i.*,
+                c.app_password
             FROM hris_user_accounts a
             INNER JOIN hris_user_infos i ON a.user_id = i.user_id
+            INNER JOIN hris_user_mail_credentials c ON i.user_id = c.user_id
             WHERE a.user_id = ?;
         `;
+
         const [results] = await pool.execute(sql, [user_id]);
         return results[0];
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log(error.message );
+        return [];
+        
     }
 
 }
@@ -87,14 +92,16 @@ exports.emailApplicant = async (req, res) => {
 
         // config of email message
         const mailOptions = {
-            from: `"FullSuite" <${process.env.EMAIL_USER}>`,
+            from: `"FullSuite" <${userData.user_email}>`,
             to: recipientEmails,
             subject: email_subject,
             html: email_body,
-        };
-
+        }; 
+        
+        //create transporter
+        const transporter = createTransporter({email_user: userData.user_email, email_pass: userData.app_password})
         const info = await transporter.sendMail(mailOptions);
-
+        
         res.status(200).json({ message: "Email sent successfully", info: info.response });
     } catch (error) {
         console.error("Error sending email:", error);

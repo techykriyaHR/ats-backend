@@ -1,16 +1,21 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// Transporter for email feature
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+// Transporter for email feature. 
+// We're creating a transporter for each accounts
+const createTransporter = (user) => {
+    console.log(user);
+    
+    return nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: true,
+        auth: {
+            user: user.email_user,
+            pass: user.email_pass
+        }
+    });
+}
 
 
-module.exports = transporter;
+module.exports = createTransporter;
