@@ -39,3 +39,24 @@ exports.getUserInfo = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// New function to get all user accounts
+exports.getAllUserAccounts = async (req, res) => {
+    const sql = `
+        SELECT 
+            hris_user_accounts.user_id, 
+            hris_user_infos.first_name, 
+            hris_user_infos.middle_name, 
+            hris_user_infos.last_name
+        FROM hris_user_accounts
+        LEFT JOIN hris_user_infos ON hris_user_accounts.user_id = hris_user_infos.user_id
+    `;
+
+    try {
+        const [results, fields] = await pool.execute(sql);
+        return res.status(200).json({ message: "User accounts retrieved", userAccounts: results });
+    } catch (error) {
+        console.error("Error fetching user accounts:", error);
+        return res.status(500).json({ message: "Error fetching user accounts", error });
+    }
+};
