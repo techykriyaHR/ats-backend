@@ -128,8 +128,6 @@ exports.getApplicant = async (req, res) => {
                 j.is_open AS job_is_open,
                 j.created_at AS job_created_at,
                 j.created_by AS job_created_by,
-                j.updated_at AS job_updated_at,
-                j.updated_by AS job_updated_by
 
             FROM ats_applicants a
 
