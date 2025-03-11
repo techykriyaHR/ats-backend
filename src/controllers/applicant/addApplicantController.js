@@ -1,27 +1,29 @@
+const multer = require('multer');
+const upload = multer();
+
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../../config/db");
 const app = require("../../app");
 
-// Insert applicant into the database
 const insertApplicant = async (applicant) => {
     const applicant_id = uuidv4();
     const contact_id = uuidv4();
     const tracking_id = uuidv4();
     const progress_id = uuidv4();
+    let connection;
 
     try {
-        // Insert into ats_applicant_progress first
+        connection = await pool.getConnection();
+        await connection.beginTransaction(); // Start transaction
+
+        // Insert into ats_applicant_progress
         let sql = `INSERT INTO ats_applicant_progress (progress_id, stage, status) VALUES (?, ?, ?)`;
-        let values = [
-            progress_id, 
-            'PRE_SCREENING', 
-            'NONE'
-        ];
-        await pool.execute(sql, values);
+        let values = [progress_id, 'PRE_SCREENING', 'NONE'];
+        await connection.execute(sql, values);
 
         // Insert into ats_applicant_trackings
         sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
             applicant_id,
@@ -33,11 +35,11 @@ const insertApplicant = async (applicant) => {
             "468eb32f-f8c1-11ef-a725-0af0d960a833",
             applicant.position_id
         ];
-        await pool.execute(sql, values);
+        await connection.execute(sql, values);
 
         // Insert into ats_applicants
         sql = `INSERT INTO ats_applicants (applicant_id, first_name, middle_name, last_name, contact_id, gender, birth_date, discovered_at, cv_link) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             applicant_id,
             applicant.first_name,
@@ -46,10 +48,10 @@ const insertApplicant = async (applicant) => {
             contact_id,
             applicant.gender,
             applicant.birth_date,
-            applicant.discovered_at,
+            applicant.discovered_at, // Store as string
             applicant.cv_link || null
         ];
-        await pool.execute(sql, values);
+        await connection.execute(sql, values);
 
         // Insert into ats_contact_infos
         sql = `INSERT INTO ats_contact_infos (contact_id, applicant_id, mobile_number_1, mobile_number_2, email_1, email_2, email_3) 
@@ -63,12 +65,21 @@ const insertApplicant = async (applicant) => {
             applicant.email_2 || null,
             applicant.email_3 || null
         ];
-        await pool.execute(sql, values);
+        await connection.execute(sql, values);
 
+        // Commit the transaction if all queries succeed
+        await connection.commit();
         return true;
     } catch (error) {
+        if (connection) {
+            await connection.rollback(); // Rollback on error
+        }
         console.error("Error inserting applicant:", error);
         return false;
+    } finally {
+        if (connection) {
+            connection.release(); // Release the connection back to the pool
+        }
     }
 };
 
@@ -146,43 +157,82 @@ exports.checkDuplicates = async (req, res) => {
     }
     return res.json({ isDuplicate: false, message: "no duplicates detected" });
 };
-
-// Add applicant
 exports.addApplicant = async (req, res) => {
-    const applicant = JSON.parse(req.body.applicant);
-
-    const isSuccess = await insertApplicant(applicant);
-    if (isSuccess) {
-        return res.status(201).json({ message: "successfully inserted" });
-    }
-    res.status(500).json({ message: "failed to insert" });
-};
-
-// Upload applicants
-exports.uploadApplicants = async (req, res) => {
     try {
-        const applicants = JSON.parse(req.body.applicants);
+        console.log("Request body:", req.body); // Log the entire request body
 
-        const flagged = [];
-        console.log("applicants array of object literal: ", applicants);
-        console.log("type ", typeof(applicants));
-        const applicantsFromDB = await getAllApplicants();
-
-        applicants.forEach((applicant) => {
-            const possibleDuplicates = compare(applicant, applicantsFromDB);
-
-            if (possibleDuplicates.length > 0) {
-                flagged.push({ applicant: applicant, possibleDuplicates: possibleDuplicates });
-            } else {
-                insertApplicant(applicant) ? console.log("inserted") : console.log("failed");
-            }
-        });
-
-        if (flagged.length > 0) {
-            return res.status(200).json({ message: "duplicates detected", flagged: flagged });
+        if (!req.body.applicant) {
+            return res.status(400).json({ message: "Applicant data is missing" });
         }
-        return res.status(201).json({ message: "All applicants successfully inserted" });
+
+        const applicant = JSON.parse(req.body.applicant);
+        console.log("Parsed applicant:", applicant); // Log the parsed applicant
+
+        const isSuccess = await insertApplicant(applicant);
+        if (isSuccess) {
+            console.log("Applicant inserted successfully:", applicant);
+            return res.status(201).json({ message: "successfully inserted" });
+        }
+        console.log("Failed to insert applicant:", applicant);
+        res.status(500).json({ message: "failed to insert" });
     } catch (error) {
-        res.status(500).json({ message: "Error processing applicants", error });
+        console.error("Error processing applicant:", error);
+        res.status(500).json({ message: "Error processing applicant", error: error.message });
     }
 };
+exports.uploadApplicants = [
+    upload.none(), // Middleware to parse FormData
+    async (req, res) => {
+      try {
+        console.log("Request body received:", req.body); // Enhanced logging
+        
+        if (!req.body.applicants) {
+          return res.status(400).json({ message: "No applicants data found in request" });
+        }
+        
+        const applicants = JSON.parse(req.body.applicants);
+        console.log("Parsed applicants:", applicants); // Enhanced logging
+        
+        if (!Array.isArray(applicants)) {
+          return res.status(400).json({ message: "Applicants data is not an array" });
+        }
+  
+        const flagged = [];
+        const successfulInserts = [];
+        const failedInserts = [];
+        const applicantsFromDB = await getAllApplicants();
+  
+        for (const applicant of applicants) {
+          const possibleDuplicates = compare(applicant, applicantsFromDB);
+  
+          if (possibleDuplicates.length > 0) {
+            flagged.push({ applicant: applicant, possibleDuplicates: possibleDuplicates });
+          } else {
+            try {
+              const isInserted = await insertApplicant(applicant);
+              if (isInserted) {
+                console.log("Applicant inserted successfully:", applicant);
+                successfulInserts.push(applicant);
+              } else {
+                console.log("Failed to insert applicant:", applicant);
+                failedInserts.push({ applicant, reason: "Database insert returned false" });
+              }
+            } catch (insertError) {
+              console.error("Error inserting applicant:", insertError);
+              failedInserts.push({ applicant, reason: insertError.message });
+            }
+          }
+        }
+  
+        return res.status(200).json({ 
+          message: `Processed ${applicants.length} applicants. Inserted: ${successfulInserts.length}, Flagged: ${flagged.length}, Failed: ${failedInserts.length}`,
+          flagged: flagged,
+          successful: successfulInserts.length,
+          failed: failedInserts.length > 0 ? failedInserts : undefined
+        });
+      } catch (error) {
+        console.error("Error processing applicants:", error);
+        res.status(500).json({ message: "Error processing applicants", error: error.message });
+      }
+    }
+  ];
