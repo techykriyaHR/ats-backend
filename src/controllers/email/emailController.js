@@ -35,7 +35,7 @@ const getUserInfo = async (user_id) => {
                 c.app_password
             FROM hris_user_accounts a
             INNER JOIN hris_user_infos i ON a.user_id = i.user_id
-            INNER JOIN hris_user_mail_credentials c ON i.user_id = c.user_id
+            INNER JOIN ats_smtp_credentials c ON i.user_id = c.user_id
             WHERE a.user_id = ?;
         `;
 
