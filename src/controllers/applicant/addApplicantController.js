@@ -149,7 +149,7 @@ const compare = (applicant, applicantsFromDB) => {
 
 // Check for duplicates
 exports.checkDuplicates = async (req, res) => {
-    const applicant = JSON.parse(req.body.applicant);
+    const applicant = req.body;
     const applicantsFromDB = await getAllApplicants();
 
     const possibleDuplicates = compare(applicant, applicantsFromDB);
@@ -161,12 +161,11 @@ exports.checkDuplicates = async (req, res) => {
 
 exports.addApplicant = async (req, res) => {
     try {
-        if (!req.body.applicant) {
+        if (!req.body) {
             return res.status(400).json({ message: "Applicant data is missing" });
         }
         
-        const applicant = JSON.parse(req.body.applicant);
-        console.log("Parsed applicant:", applicant); // Log the parsed applicant
+        const applicant = req.body;
 
         const isSuccess = await insertApplicant(applicant);
         if (isSuccess) {
@@ -180,23 +179,21 @@ exports.addApplicant = async (req, res) => {
         res.status(500).json({ message: "Error processing applicant", error: error.message });
     }
 };
+
 exports.uploadApplicants = [
-    upload.none(), // Middleware to parse FormData
+    upload.none(), 
     async (req, res) => {
       try {
-        console.log("Request body received:", req.body); // Enhanced logging
-        
-        if (!req.body.applicants) {
+        if (!req.body) {
           return res.status(400).json({ message: "No applicants data found in request" });
         }
         
-        const applicants = JSON.parse(req.body.applicants);
-        console.log("Parsed applicants:", applicants); // Enhanced logging
+        const applicants = req.body;
         
         if (!Array.isArray(applicants)) {
           return res.status(400).json({ message: "Applicants data is not an array" });
         }
-  
+
         const flagged = [];
         const successfulInserts = [];
         const failedInserts = [];
