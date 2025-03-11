@@ -56,6 +56,9 @@ const userRoutes = require('./routes/user/userRoutes');
 //Misc (for fetching config from db)
 const statusRoutes = require('./routes/status/statusRoutes');
 
+// upload
+const uploadRoutes = require('./routes/upload/uploadRoutes');
+
 // Routes
 app.use('/applicants', applicantRoutes);
 app.use('/applicants/add', addApplicantRoutes);
@@ -72,6 +75,7 @@ app.use('/email', emailRoutes);
 app.use('/company', positionRoutes);
 app.use('/user', userRoutes);
 app.use('/status', statusRoutes);
+app.use('/upload', uploadRoutes);
 
 
 const verifyToken = require("./middlewares/verifyToken");
