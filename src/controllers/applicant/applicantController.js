@@ -11,6 +11,7 @@ exports.getAllApplicants = async (req, res) => {
                 a.last_name, 
                 a.date_created, 
                 p.status, 
+                p.progress_id,
                 j.title
             FROM ats_applicants a
             LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
