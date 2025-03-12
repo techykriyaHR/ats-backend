@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const applicantController = require("../../controllers/applicant/applicantController")
 
+//search for a list of applicants that matches search query and corresponding
+//status, and position
+router.get("/search", applicantController.searchApplicant);
+
 //gets all applicants
 router.get("/", applicantController.getAllApplicants)
 
@@ -10,6 +14,7 @@ router.get("/filter", applicantController.getApplicantsFilter)
 
 //gets a specific applicant
 router.get("/:applicant_id", applicantController.getApplicant);
+
 
 
 module.exports = router;
