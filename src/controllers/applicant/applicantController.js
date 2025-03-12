@@ -82,7 +82,6 @@ exports.getApplicantsFilter = async (req, res) => {
     return res.json(results)
 }
 
-// applicants/:applicant_id
 exports.getApplicant = async (req, res) => {
     try {
         const applicant_id = req.params.applicant_id;
@@ -127,7 +126,7 @@ exports.getApplicant = async (req, res) => {
                 j.employment_type,
                 j.is_open AS job_is_open,
                 j.created_at AS job_created_at,
-                j.created_by AS job_created_by,
+                j.created_by AS job_created_by
 
             FROM ats_applicants a
 
