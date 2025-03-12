@@ -1,5 +1,71 @@
 const pool = require("../../config/db");
 
+// /applicants/search?query?
+exports.searchApplicant = async (req, res) => {
+    try {
+        const filters = req.query;
+        console.log(filters);
+        
+        const conditions = [];
+        const values = [];
+
+        console.log(filters);
+
+        if (filters.month) {
+            conditions.push("MONTHNAME(a.date_created) = ?");
+            values.push(filters.month);
+        }
+        if (filters.year) {
+            conditions.push("YEAR(a.date_created) = ?");
+            values.push(filters.year);
+        }
+        if (filters.position) {
+            conditions.push("j.title LIKE ?");
+            values.push(`%${filters.position}%`);
+        }
+        if (filters.searchQuery) {
+            conditions.push("(a.first_name LIKE ? OR a.middle_name LIKE ? OR a.last_name LIKE ?)");
+            values.push(`%${filters.searchQuery}%`, `%${filters.searchQuery}%`, `%${filters.searchQuery}%`);
+        }
+        if (filters.status) {
+            const statusArray = Array.isArray(filters.status) ? filters.status : [filters.status];
+            const placeholders = statusArray.map(() => "?").join(", ");
+            conditions.push(`p.status IN (${placeholders})`);
+            values.push(...statusArray);
+        }
+
+        // Ensure at least one condition to avoid syntax error in SQL
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const sql = `
+            SELECT
+                a.applicant_id, 
+                a.first_name, 
+                a.middle_name, 
+                a.last_name,
+                a.date_created, 
+                p.status, 
+                j.title, 
+                p.progress_id
+            FROM ats_applicants a
+            LEFT JOIN ats_applicant_trackings t
+                ON a.applicant_id = t.applicant_id
+            LEFT JOIN ats_applicant_progress p
+                ON t.progress_id = p.progress_id
+            LEFT JOIN sl_company_jobs j
+                ON t.position_id = j.job_id
+            ${whereClause}
+        `;
+
+        const [results] = await pool.execute(sql, values);
+
+        return res.json(results);
+    } catch (error) {
+        console.error("Error fetching applicants:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
 //applicants/
 exports.getAllApplicants = async (req, res) => {
     try {
@@ -158,3 +224,6 @@ exports.getApplicant = async (req, res) => {
         res.status(500).json({ message: "Server error", error });
     }
 };
+
+
+
