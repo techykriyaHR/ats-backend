@@ -14,7 +14,7 @@ const insertApplicant = async (applicant) => {
 
     try {
         connection = await pool.getConnection();
-        await connection.beginTransaction();
+        await connection.beginTransaction(); // Start transaction
 
         // Insert into ats_applicant_progress
         let sql = `INSERT INTO ats_applicant_progress (progress_id, stage, status) VALUES (?, ?, ?)`;
@@ -22,13 +22,12 @@ const insertApplicant = async (applicant) => {
         await connection.execute(sql, values);
 
         // Insert into ats_applicant_trackings
-        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_at, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
-                VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?)`;
+        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
             applicant_id,
             progress_id,
-            applicant.created_at || new Date(),
             applicant.created_by,
             applicant.updated_by,
             applicant.applied_source || null,
@@ -49,7 +48,7 @@ const insertApplicant = async (applicant) => {
             contact_id,
             applicant.gender,
             applicant.birth_date,
-            applicant.discovered_at, 
+            applicant.discovered_at, // Store as string
             applicant.cv_link || null
         ];
         await connection.execute(sql, values);
@@ -79,7 +78,7 @@ const insertApplicant = async (applicant) => {
         return false;
     } finally {
         if (connection) {
-            connection.release();
+            connection.release(); // Release the connection back to the pool
         }
     }
 };
@@ -149,7 +148,7 @@ const compare = (applicant, applicantsFromDB) => {
 
 // Check for duplicates
 exports.checkDuplicates = async (req, res) => {
-    const applicant = req.body;
+    const applicant = JSON.parse(req.body.applicant);
     const applicantsFromDB = await getAllApplicants();
 
     const possibleDuplicates = compare(applicant, applicantsFromDB);
@@ -158,14 +157,16 @@ exports.checkDuplicates = async (req, res) => {
     }
     return res.json({ isDuplicate: false, message: "no duplicates detected" });
 };
-
 exports.addApplicant = async (req, res) => {
     try {
-        if (!req.body) {
+        console.log("Request body:", req.body); // Log the entire request body
+
+        if (!req.body.applicant) {
             return res.status(400).json({ message: "Applicant data is missing" });
         }
-        
-        const applicant = req.body;
+
+        const applicant = JSON.parse(req.body.applicant);
+        console.log("Parsed applicant:", applicant); // Log the parsed applicant
 
         const isSuccess = await insertApplicant(applicant);
         if (isSuccess) {
@@ -179,21 +180,23 @@ exports.addApplicant = async (req, res) => {
         res.status(500).json({ message: "Error processing applicant", error: error.message });
     }
 };
-
 exports.uploadApplicants = [
-    upload.none(), 
+    upload.none(), // Middleware to parse FormData
     async (req, res) => {
       try {
-        if (!req.body) {
+        console.log("Request body received:", req.body); // Enhanced logging
+        
+        if (!req.body.applicants) {
           return res.status(400).json({ message: "No applicants data found in request" });
         }
         
-        const applicants = req.body;
+        const applicants = JSON.parse(req.body.applicants);
+        console.log("Parsed applicants:", applicants); // Enhanced logging
         
         if (!Array.isArray(applicants)) {
           return res.status(400).json({ message: "Applicants data is not an array" });
         }
-
+  
         const flagged = [];
         const successfulInserts = [];
         const failedInserts = [];
