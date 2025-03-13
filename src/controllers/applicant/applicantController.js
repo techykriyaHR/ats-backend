@@ -69,6 +69,35 @@ exports.searchApplicant = async (req, res) => {
 //applicants/
 exports.getAllApplicants = async (req, res) => {
     try {
+        const sql = `
+            SELECT 
+                a.applicant_id, 
+                a.first_name, 
+                a.middle_name, 
+                a.last_name, 
+                a.date_created, 
+                p.status, 
+                p.progress_id,
+                j.title
+            FROM ats_applicants a
+            LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
+            LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
+            LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id;
+        `;
+
+        const [results] = await pool.execute(sql);
+
+        if (results) {
+            return res.status(201).json(results)
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error });
+    }
+}
+
+//applicants/
+exports.getAllApplicantsPagination = async (req, res) => {
+    try {
         console.log("running...");
         
         // Extract pagination parameters from the request query
@@ -120,35 +149,6 @@ exports.getAllApplicants = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
-//applicants/
-exports.getAllApplicantsPagination = async (req, res) => {
-    try {
-        const sql = `
-            SELECT 
-                a.applicant_id, 
-                a.first_name, 
-                a.middle_name, 
-                a.last_name, 
-                a.date_created, 
-                p.status, 
-                p.progress_id,
-                j.title
-            FROM ats_applicants a
-            LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
-            LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
-            LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id;
-        `;
-
-        const [results] = await pool.execute(sql);
-
-        if (results) {
-            return res.status(201).json(results)
-        }
-    } catch (error) {
-        return res.status(500).json({ error: error });
-    }
-}
 
 // applicants/filter
 exports.getApplicantsFilter = async (req, res) => {
