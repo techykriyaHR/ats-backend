@@ -67,59 +67,59 @@ exports.searchApplicant = async (req, res) => {
 };
 
 //applicants/
-// exports.getAllApplicants = async (req, res) => {
-//     try {
-//         console.log("running...");
+exports.getAllApplicants = async (req, res) => {
+    try {
+        console.log("running...");
         
-//         // Extract pagination parameters from the request query
-//         let { page, limit } = req.query;
-//         page = parseInt(page) || 1; // Default page = 1
-//         limit = parseInt(limit) || 10; // Default limit = 10
+        // Extract pagination parameters from the request query
+        let { page, limit } = req.query;
+        page = parseInt(page) || 1; // Default page = 1
+        limit = parseInt(limit) || 10; // Default limit = 10
 
-//         const offset = (page - 1) * limit;
+        const offset = (page - 1) * limit;
         
         
 
-//         // SQL query with LIMIT and OFFSET for pagination
-//         const sql = `
-//             SELECT 
-//                 a.applicant_id, 
-//                 a.first_name, 
-//                 a.middle_name, 
-//                 a.last_name, 
-//                 a.date_created, 
-//                 p.status, 
-//                 p.progress_id,
-//                 j.title
-//             FROM ats_applicants a
-//             LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
-//             LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
-//             LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id
-//             LIMIT ? OFFSET ?;
-//         `;
+        // SQL query with LIMIT and OFFSET for pagination
+        const sql = `
+            SELECT 
+                a.applicant_id, 
+                a.first_name, 
+                a.middle_name, 
+                a.last_name, 
+                a.date_created, 
+                p.status, 
+                p.progress_id,
+                j.title
+            FROM ats_applicants a
+            LEFT JOIN ats_applicant_trackings t ON a.applicant_id = t.applicant_id
+            LEFT JOIN ats_applicant_progress p ON t.progress_id = p.progress_id
+            LEFT JOIN sl_company_jobs j ON t.position_id = j.job_id
+            LIMIT ? OFFSET ?;
+        `;
 
 
 
-//         // Query to count total number of applicants
-//         const countSql = `SELECT COUNT(*) AS total FROM ats_applicants`;
+        // Query to count total number of applicants
+        const countSql = `SELECT COUNT(*) AS total FROM ats_applicants`;
 
-//         // Execute queries
-//         const [results] = await pool.query(sql, [limit, offset]);
-//         //const [results] = await pool.execute(sql);
-//         const [[{ total }]] = await pool.execute(countSql);
+        // Execute queries
+        const [results] = await pool.query(sql, [limit, offset]);
+        //const [results] = await pool.execute(sql);
+        const [[{ total }]] = await pool.execute(countSql);
 
-//         // Return paginated results with metadata
-//         return res.status(200).json({
-//             applicants: results,
-//             totalApplicants: total,
-//             totalPages: Math.ceil(total / limit),
-//             currentPage: page
-//         });
+        // Return paginated results with metadata
+        return res.status(200).json({
+            applicants: results,
+            totalApplicants: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page
+        });
 
-//     } catch (error) {
-//         return res.status(500).json({ error: error.message });
-//     }
-// };
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
 
 //applicants/
 exports.getAllApplicantsPagination = async (req, res) => {
