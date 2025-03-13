@@ -114,23 +114,23 @@ const compare = (applicant, applicantsFromDB) => {
             similarity.push("Name");
         }
 
-        if (applicantFromDb.email_1 && applicant.email === applicantFromDb.email_1) {
+        if (applicantFromDb.email_1 && applicant.email_1 === applicantFromDb.email_1) {
             similarity.push("Email");
         }
 
-        if (applicantFromDb.email_2 && applicant.email === applicantFromDb.email_2) {
+        if (applicantFromDb.email_2 && applicant.email_1 === applicantFromDb.email_2) {
             similarity.push("Second Email");
         }
 
-        if (applicantFromDb.email_3 && applicant.email === applicantFromDb.email_3) {
+        if (applicantFromDb.email_3 && applicant.email_1 === applicantFromDb.email_3) {
             similarity.push("Third Email");
         }
 
-        if (applicantFromDb.mobile_number_1 && applicant.contactNo === applicantFromDb.mobile_number_1) {
+        if (applicantFromDb.mobile_number_1 && applicant.mobile_number_1 === applicantFromDb.mobile_number_1) {
             similarity.push("Mobile Number");
         }
 
-        if (applicantFromDb.mobile_number_2 && applicant.contactNo === applicantFromDb.mobile_number_2) {
+        if (applicantFromDb.mobile_number_2 && applicant.mobile_number_1 === applicantFromDb.mobile_number_2) {
             similarity.push("Second Mobile Number");
         }
 
@@ -145,7 +145,6 @@ const compare = (applicant, applicantsFromDB) => {
 
     return possibleDuplicates;
 };
-
 // Check for duplicates
 exports.checkDuplicates = async (req, res) => {
     const applicant = JSON.parse(req.body.applicant);
