@@ -58,3 +58,27 @@ exports.source = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.applicationTrend = async (req, res) => {
+    try {
+        let sql = `
+            SELECT MONTHNAME(t.created_at) as month, COUNT(*) as count
+            FROM ats_applicant_trackings t
+            GROUP BY MONTHNAME(t.created_at)
+        `;
+
+        const [trend] = await pool.execute(sql);
+
+        sql = `
+            SELECT COUNT(*) AS total 
+            FROM ats_applicant_trackings 
+        `;
+
+        let [total] = await pool.execute(sql);
+        total = total[0]?.total;
+
+        res.status(200).json({message: "okay", data: {total: total, trend: trend}});
+    } catch (error) {
+        res.status(500).json({ message: error.message});
+    }
+}
