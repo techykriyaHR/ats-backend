@@ -1,5 +1,7 @@
 const pool = require("../../config/db");
 
+
+
 const updateStatus = async (progress_id, status) => {
 
     converted_status = status.toUpperCase().replace(/ /g, "_")
@@ -18,12 +20,24 @@ const updateStatus = async (progress_id, status) => {
       
         await pool.execute(sql, values);
         
+        sql = `
+            UPDATE ats_applicant_trackings 
+            SET updated_at = NOW() 
+            WHERE progress_id = ?
+        `;
+        values = [progress_id]; 
+
+        await pool.execute(sql, values);
+
         return true
     } catch (error) {
         console.log("Error updating status of applicant")
         return false
     }
+
+
 }
+
 
 const updateStage = (status) => {
     let pre_screening = "TEST_SENT";
@@ -57,3 +71,5 @@ exports.updateApplicantStatus = async (req, res) => {
     }
     res.status(500).json({ message: "failed to update status of applicant"})
 }
+
+// TODO: UPDATE THE TRACKINGS TO UDATE THE UPDATE_AT
