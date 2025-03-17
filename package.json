@@ -21,7 +21,7 @@
   "homepage": "https://github.com/kriyahr/ats-backend#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.5.1",
+    "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",

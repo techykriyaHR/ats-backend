@@ -6,6 +6,11 @@ const applicantController = require("../../controllers/applicant/applicantContro
 //status, and position
 router.get("/search", applicantController.searchApplicant);
 
+//gets all applicants but limit to x. 
+//eg., http://localhost:3000/applicants/pagination?page=1&limit=10
+//Though this will work with http://localhost:3000/applicants/pagination
+router.get("/pagination", applicantController.getAllApplicantsPagination);
+
 //gets all applicants
 router.get("/", applicantController.getAllApplicants)
 
