@@ -10,7 +10,7 @@ const updateStatus = async (progress_id, user_id, status) => {
 
     try {
         //update status of applicant
-        let sql = "UPDATE ats_applicant_progress SET stage =?, status = ? WHERE progress_id = ?"
+        let sql = "UPDATE ats_applicant_progress SET stage =?, status = ?, updated_at = NOW() WHERE progress_id = ?"
         let values = [
             stage,
             converted_status,
@@ -21,8 +21,7 @@ const updateStatus = async (progress_id, user_id, status) => {
         
         sql = `
             UPDATE ats_applicant_trackings 
-            SET updated_by = ?
-            SET updated_at = NOW()
+            SET updated_by = ?,updated_at = NOW()
             WHERE progress_id = ?
         `;
 
@@ -72,5 +71,3 @@ exports.updateApplicantStatus = async (req, res) => {
     }
     res.status(500).json({ message: "failed to update status of applicant"})
 }
-
-// TODO: UPDATE THE TRACKINGS TO UDATE THE UPDATE_AT
