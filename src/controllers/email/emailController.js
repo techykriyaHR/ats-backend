@@ -1,5 +1,7 @@
 const pool = require("../../config/db");
+const { v4: uuidv4 } = require("uuid");
 const createTransporter = require("../../config/transporter");
+const { da } = require("date-fns/locale");
 
 const getApplicantInfo = async (applicant_id) => {
     const sql = `
@@ -74,6 +76,38 @@ const emailSignature = (userData) => {
     `;
 };
 
+exports.addEmailTemplates = async (req, res) => {
+    try {
+        const data = req.body;
+        const template_id = uuidv4();
+    
+        const sql = `
+            INSERT INTO ats_email_templates (template_id, company_id, title, subject, body)
+            VALUES (?, ?, ?, ?, ?);
+        `;
+    
+        const values = [template_id, data.company_id, data.title, data.subject, data.body]; 
+        await pool.execute(sql, values);
+        res.status(200).json({message: "template added"})
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+exports.emailTemplates = async (req, res) => {
+    try {
+        const sql = `
+            SELECT * 
+            FROM ats_email_templates
+        `;
+        const [results] = await pool.execute(sql);
+        res.status(200).json({ message: "fetched successfully", templates: results });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 exports.emailApplicant = async (req, res) => {
     try {
         let { applicant_id, user_id, email_subject, email_body } = req.body;
@@ -113,4 +147,4 @@ exports.emailApplicant = async (req, res) => {
         console.error("Error sending email:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
-};
+}; 
