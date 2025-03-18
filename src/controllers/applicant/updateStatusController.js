@@ -58,7 +58,7 @@ const updateStage = (status) => {
         return "UNSUCCESSFUL";
     }
     else {
-        console.log(status + " not in the stage")
+        return "PRE_SCREENING";
     }
 }
 
