@@ -180,15 +180,15 @@ exports.getApplicantsFilter = async (req, res) => {
 
     const sql = `
         SELECT
-            a.applicant_id, 
-            a.first_name, 
-            a.middle_name, 
-            a.last_name,
-            a.date_created, 
+            a.*,
+            c.*, 
+            p.stage, 
             p.status, 
             j.title, 
             p.progress_id
         FROM ats_applicants a
+        LEFT JOIN ats_contact_infos c
+            ON a.applicant_id = c.applicant_id
         LEFT JOIN ats_applicant_trackings t
             ON a.applicant_id = t.applicant_id
         LEFT JOIN ats_applicant_progress p
