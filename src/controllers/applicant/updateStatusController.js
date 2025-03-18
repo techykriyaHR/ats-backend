@@ -22,6 +22,7 @@ const updateStatus = async (progress_id, user_id, status) => {
         sql = `
             UPDATE ats_applicant_trackings 
             SET updated_by = ?
+            SET updated_at = NOW()
             WHERE progress_id = ?
         `;
 
