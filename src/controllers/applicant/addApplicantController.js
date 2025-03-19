@@ -27,8 +27,8 @@ const insertApplicant = async (applicant) => {
         await connection.execute(sql, values);
 
         // Insert into ats_applicant_trackings
-        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        sql = `INSERT INTO ats_applicant_trackings (tracking_id, applicant_id, progress_id, created_by, updated_by, applied_source, referrer_id, company_id, position_id, test_result) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         values = [
             tracking_id,
             applicant_id,
@@ -38,7 +38,9 @@ const insertApplicant = async (applicant) => {
             applicant.applied_source || null,
             applicant.referrer_id || null,
             "468eb32f-f8c1-11ef-a725-0af0d960a833", //company id
-            applicant.position_id
+            applicant.position_id, 
+            applicant.test_result
+            
         ];
         await connection.execute(sql, values);
 
