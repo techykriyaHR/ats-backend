@@ -58,8 +58,6 @@ const f_topJobs = async () => {
     }
 };
 
-
-
 const f_InternalExternalHires = async () => {
     try {
         const [internal] = await pool.execute(
@@ -132,7 +130,6 @@ const f_dropOffRate = async () => {
     }
 };
 
-
 exports.getMetrics = async (req, res) => {
     try {
         const applicationsReceived = await f_applicationsReceived();
@@ -151,3 +148,21 @@ exports.getMetrics = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+
+// endpoint for getting the count of applicant from FS website
+exports.getFSApplicationCount = async (req, res) => {
+    try {
+        const sql = `
+            SELECT COUNT(*) as fs_count
+            FROM ats_applicant_trackings
+            WHERE applied_source = 'Suitelife'
+        `;
+
+        const [result] = await pool.execute(sql);
+        const count = result[0].fs_count;
+        res.status(200).json({message: "okay", fs_count: count}); 
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
