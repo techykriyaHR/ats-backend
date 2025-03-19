@@ -27,16 +27,18 @@ const editApplicant = async (applicant) => {
     await pool.execute(sql, values);
 
     if (applicant.created_at) {
-      sql = `UPDATE ats_applicant_trackings SET position_id = ?, created_at = ? WHERE applicant_id = ?`;
+      sql = `UPDATE ats_applicant_trackings SET position_id = ?, created_at = ?, test_result = ? WHERE applicant_id = ?`;
       values = [ 
         applicant.position_id,
         applicant.created_at,
+        applicant.test_result || null,
         applicant.applicant_id
       ];
     } else {
-      sql = `UPDATE ats_applicant_trackings SET position_id = ? WHERE applicant_id = ?`;
+      sql = `UPDATE ats_applicant_trackings SET position_id = ?, test_result = ? WHERE applicant_id = ?`;
       values = [
         applicant.position_id,
+        applicant.test_result || null,
         applicant.applicant_id
       ];
     }
