@@ -2,7 +2,18 @@ const pool = require("../../config/db");
 
 const editApplicant = async (applicant) => {
   try {
-    let sql = "UPDATE ats_applicants SET first_name = ?, middle_name = ?, last_name = ?, gender = ?, birth_date = ?, discovered_at = ?, cv_link = ? WHERE applicant_id = ?";
+    let sql = `
+      UPDATE ats_applicants 
+      SET 
+        first_name = ?, 
+        middle_name = ?, 
+        last_name = ?, 
+        gender = ?, 
+        birth_date = ?, 
+        discovered_at = ?, 
+        cv_link = ? 
+      WHERE applicant_id = ?
+    `;
     let values = [
       applicant.first_name,
       applicant.middle_name || null,
@@ -15,11 +26,20 @@ const editApplicant = async (applicant) => {
     ];
     await pool.execute(sql, values);
 
-    sql = "UPDATE ats_contact_infos SET mobile_number_1 = ?, mobile_number_2 = ?, email_1 = ?, email_2 = ?, email_3 = ? WHERE applicant_id = ?";
+    sql = `
+      UPDATE ats_contact_infos 
+      SET 
+        mobile_number_1 = ?, 
+        mobile_number_2 = ?, 
+        email_1 = ?, 
+        email_2 = ?, 
+        email_3 = ? 
+      WHERE applicant_id = ?
+    `;
     values = [
       applicant.mobile_number_1 || null,
       applicant.mobile_number_2 || null,
-      applicant.email_1,
+      applicant.email_1 || null,
       applicant.email_2 || null,
       applicant.email_3 || null,
       applicant.applicant_id
@@ -27,7 +47,14 @@ const editApplicant = async (applicant) => {
     await pool.execute(sql, values);
 
     if (applicant.created_at) {
-      sql = `UPDATE ats_applicant_trackings SET position_id = ?, created_at = ?, test_result = ? WHERE applicant_id = ?`;
+      sql = `
+        UPDATE ats_applicant_trackings 
+        SET 
+          position_id = ?, 
+          created_at = ?, 
+          test_result = ? 
+        WHERE applicant_id = ?
+      `;
       values = [ 
         applicant.position_id,
         applicant.created_at,
@@ -35,7 +62,13 @@ const editApplicant = async (applicant) => {
         applicant.applicant_id
       ];
     } else {
-      sql = `UPDATE ats_applicant_trackings SET position_id = ?, test_result = ? WHERE applicant_id = ?`;
+      sql = `
+        UPDATE ats_applicant_trackings 
+        SET 
+          position_id = ?, 
+          test_result = ? 
+        WHERE applicant_id = ?
+      `;
       values = [
         applicant.position_id,
         applicant.test_result || null,
@@ -55,7 +88,7 @@ exports.editApplicant = async (req, res) => {
   const applicant = JSON.parse(req.body.applicant);
   const isSuccess = await editApplicant(applicant);
   if (isSuccess) {
-    return res.status(201).json({ message: "successfully updated" })
+    return res.status(201).json({ message: "successfully updated" });
   }
-  res.status(500).json({ message: "failed to update" })
-}
+  res.status(500).json({ message: "failed to update" });
+};
