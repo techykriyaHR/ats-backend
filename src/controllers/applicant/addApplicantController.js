@@ -1,9 +1,14 @@
 const multer = require('multer');
 const upload = multer();
+require("dotenv").config(); 
 
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../../config/db");
 const app = require("../../app");
+
+// VARIABLES USED WHEN APPLIED FROM SUITELIFER'S WEBSITE. 
+const CREATED_BY = process.env.CREATED_BY || "f1f63bd4-fa33-11ef-a725-0af0d960a833";
+const UPDATED_BY = process.env.CREATED_BY || "f1f63bd4-fa33-11ef-a725-0af0d960a833";
 
 const insertApplicant = async (applicant) => {
     const applicant_id = uuidv4();
@@ -12,7 +17,7 @@ const insertApplicant = async (applicant) => {
     const progress_id = uuidv4();
     let connection;
 
-    try {
+    try { 
         connection = await pool.getConnection();
         await connection.beginTransaction(); // Start transaction
 
@@ -28,11 +33,11 @@ const insertApplicant = async (applicant) => {
             tracking_id,
             applicant_id,
             progress_id,
-            applicant.created_by,
-            applicant.updated_by,
+            applicant.created_by || CREATED_BY,
+            applicant.updated_by || UPDATED_BY,
             applicant.applied_source || null,
             applicant.referrer_id || null,
-            "468eb32f-f8c1-11ef-a725-0af0d960a833",
+            "468eb32f-f8c1-11ef-a725-0af0d960a833", //company id
             applicant.position_id
         ];
         await connection.execute(sql, values);
