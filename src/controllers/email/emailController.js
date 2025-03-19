@@ -2,7 +2,7 @@ const pool = require("../../config/db");
 const { v4: uuidv4 } = require("uuid");
 const createTransporter = require("../../config/transporter");
 const { da } = require("date-fns/locale");
-
+const {getUserInfo} = require("../../services/usersService/")
 const getApplicantInfo = async (applicant_id) => {
     const sql = `
             SELECT 
@@ -28,28 +28,7 @@ const getApplicantInfo = async (applicant_id) => {
     return results[0];
 }
 
-const getUserInfo = async (user_id) => {
-    try {
-        const sql = `
-            SELECT
-                a.*,
-                i.*,
-                c.app_password
-            FROM hris_user_accounts a
-            INNER JOIN hris_user_infos i ON a.user_id = i.user_id
-            INNER JOIN ats_smtp_credentials c ON i.user_id = c.user_id
-            WHERE a.user_id = ?;
-        `;
 
-        const [results] = await pool.execute(sql, [user_id]);
-        return results[0];
-    } catch (error) {
-        console.log(error.message);
-        return [];
-
-    }
-
-}
 
 const emailSignature = (userData) => {
     // This returns formatted HTML data for the footer. 
