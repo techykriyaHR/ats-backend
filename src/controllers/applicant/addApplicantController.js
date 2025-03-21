@@ -267,22 +267,35 @@ const getBlackListedApplicants = async () => {
     }
 }
 
-const checkInBlacklisted = (applicant, blackListedApplicants) => {
-    return blackListedApplicants.some(blacklisted => 
-        applicant.first_name === blacklisted.first_name &&
-        applicant.last_name === blacklisted.last_name &&
-        applicant.email_1 === blacklisted.email_1 &&
-        applicant.mobile_number_1 === blacklisted.mobile_number_1 &&
-        applicant.birth_date === blacklisted.birth_date
-    );
-};
-
-
 // const checkInBlacklisted = (applicant, blackListedApplicants) => {
-//     return blackListedApplicants.some(blacklisted => 
-//         applicant.first_name === blacklisted.first_name
-//     );
-// };
+//     array.forEach(blacklisted => {
+//         if (
+//             applicant.first_name === blacklisted.first_name &&
+//             applicant.last_name === blacklisted.last_name &&
+//             applicant.email_1 === blacklisted.email_1 &&
+//             applicant.mobile_number_1 === blacklisted.mobile_number_1 &&
+//             applicant.birth_date === blacklisted.birth_date
+//         ) {
+
+//         }
+//     });
+// }
+
+const checkInBlacklisted = (applicant, blackListedApplicants) => {
+    const isBlacklisted = false; 
+    blackListedApplicants.forEach(blacklisted => {
+        if (
+            applicant.first_name === blacklisted.first_name &&
+            applicant.last_name === blacklisted.last_name &&
+            applicant.email_1 === blacklisted.email_1 &&
+            applicant.mobile_number_1 === blacklisted.mobile_number_1 &&
+            applicant.birth_date === blacklisted.birth_date
+        ) {
+            isBlacklisted = true; 
+        }
+    });
+    return isBlacklisted; 
+}
 
 exports.checkIfBlacklisted = async (req, res) => {
     try {
@@ -290,6 +303,7 @@ exports.checkIfBlacklisted = async (req, res) => {
         const blackListedApplicants = await getBlackListedApplicants();
 
         const isBlacklisted = checkInBlacklisted(applicant, blackListedApplicants);
+
         
         if (isBlacklisted) {
             //email the applicant

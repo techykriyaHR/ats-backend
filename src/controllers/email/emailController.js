@@ -157,10 +157,6 @@ exports.emailApplicantGuest = async (applicant, email_subject, email_body) => {
     try {
         const userData = await getUserInfo(USER_ID);
 
-        console.log(userData);
-        
-
-
         const recipientEmails = [applicant.email_1];
         const emailSignatureString = emailSignature(userData);
         email_body = email_body + emailSignatureString;
